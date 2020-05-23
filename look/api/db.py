@@ -70,6 +70,8 @@ class Collection(object):
             result["data"] = [json.loads(row.get_data(self.attrs, depth=depth)) for row in db_data]
         else:
             result["description"] = "NO RESULT FOUND"
+
+        return result
     
     async def on_post(self, req, res, table):
         data = req.context['data']

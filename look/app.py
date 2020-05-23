@@ -8,7 +8,7 @@ from look.middleware.dbmanager import DBManager
 from look.middleware.socketmanager import SocketManager
 
 db_session = init_db()
-# insert_dummy_data(db_session())
+
 middleware = [
     JSONTranslator(),
     DBManager(db_session),
@@ -22,6 +22,9 @@ app.add_middleware(SocketManager(sio))
 class RootPage(object):
     async def on_get(self, req, res):
         res.body = "Hello, World!"
+    
+    async def on_post(self, req, res):
+        insert_dummy_data(db_session())
 
 app.add_route('/', RootPage())
 
