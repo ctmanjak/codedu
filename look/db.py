@@ -6,11 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from look.config import Config
-from look.model.user import User
-from look.model.category import Category
-from look.model.board import Board
-from look.model.chapter import Chapter
-from look.model.subchapter import Subchapter
+from look.model.base import Base
 
 def init_db():
     print("init_db")
@@ -18,20 +14,36 @@ def init_db():
 
     db_session = sessionmaker(bind=engine)
 
-    User.metadata.create_all(engine)
-    Category.metadata.create_all(engine)
-    Board.metadata.create_all(engine)
-    Chapter.metadata.create_all(engine)
-    Subchapter.metadata.create_all(engine)
+    Base.metadata.create_all(bind=engine)
 
-    return db_session
+    return db_session, engine
+
+def truncate_table(db_session, engine, tablename=None):
+    print("truncate_table")
+
+    tablename = tablename if tablename and not tablename == 'all' else None
+    with engine.begin() as conn:
+        for table in reversed(Base.metadata.sorted_tables):
+            if tablename and not table.__tablename__ == tablename: continue
+            conn.execute(table.delete())
+
+    try:
+        db_session.commit()
+    except:
+        traceback.print_exc()
+        db_session.rollback()
+
+def get_class_by_tablename(tablename):
+    for c in Base._decl_class_registry.values():
+        if hasattr(c, '__tablename__') and c.__tablename__ == tablename:
+            return c
 
 def insert_dummy_data(db_session):
     print("insert_dummy_data")
 
     models = {}
     dummy_data = {
-        'User' : [
+        'user' : [
             {
                 'username':'test',
                 'email':'test@gmail.com',
@@ -58,7 +70,7 @@ def insert_dummy_data(db_session):
                 'password':'test123!',
             },
         ],
-        'Category' : [
+        'category' : [
             {
                 'title':'Category1',
                 'subtitle':'Category1\'s subtitle',
@@ -68,7 +80,7 @@ def insert_dummy_data(db_session):
                 'subtitle':'Category2\'s subtitle',
             },
         ],
-        'Board' : [
+        'board' : [
             {
                 'title':'Board1',
                 'subtitle':'Board1\'s subtitle',
@@ -78,15 +90,15 @@ def insert_dummy_data(db_session):
                 'subtitle':'Board2\'s subtitle',
             },
         ],
-        'Chapter' : [{'title':f'Chapter{i+1}'} for i in range(4)],
-        'Subchapter' : [{'title':f'Subchapter{i+1}'} for i in range(8)],
+        'chapter' : [{'title':f'Chapter{i+1}'} for i in range(4)],
+        'subchapter' : [{'title':f'Subchapter{i+1}'} for i in range(8)],
     }
-    for data in dummy_data["User"]:
+    for data in dummy_data["user"]:
         data["password"] = sha256(data["password"].encode()).hexdigest()
 
     relationships = {
-        "User" : {
-            "target" : "Subchapter",
+        "user" : {
+            "target" : "subchapter",
             "rel_name" : "learning_progress",
             "data" : [
                 [1, 1],
@@ -94,8 +106,8 @@ def insert_dummy_data(db_session):
                 [2, 1],
             ],
         },
-        "Category" : {
-            "target" : "Board",
+        "category" : {
+            "target" : "board",
             "rel_name" : "board",
             "data" : [
                 [1, 1],
@@ -103,8 +115,8 @@ def insert_dummy_data(db_session):
                 [2, 1],
             ],
         },
-        "Board" : {
-            "target" : "Chapter",
+        "board" : {
+            "target" : "chapter",
             "rel_name" : "chapter",
             "data" : [
                 [1, 1],
@@ -113,8 +125,8 @@ def insert_dummy_data(db_session):
                 [2, 4],
             ],
         },
-        "Chapter" : {
-            "target" : "Subchapter",
+        "chapter" : {
+            "target" : "subchapter",
             "rel_name" : "subchapter",
             "data" : [
                 [1, 1],
@@ -132,7 +144,7 @@ def insert_dummy_data(db_session):
     for table in dummy_data:
         models[table] = []
         for data in dummy_data[table]:
-            models[table].append(globals()[table](**data))
+            models[table].append(get_class_by_tablename(table)(**data))
 
     for rel in relationships:
         tmp = {}

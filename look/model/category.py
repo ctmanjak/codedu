@@ -16,4 +16,4 @@ class Category(Base):
     title = Column(VARCHAR(64), nullable=False)
     subtitle = Column(VARCHAR(128), nullable=False)
 
-    board = relationship('Board', secondary=category_board)
+    board = relationship('Board', secondary=category_board, cascade="all, delete")

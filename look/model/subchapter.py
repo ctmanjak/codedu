@@ -2,6 +2,7 @@ from sqlalchemy import Column, ForeignKey
 from sqlalchemy.dialects.mysql import INTEGER, VARCHAR
 
 from look.model.base import Base
+from look.model.chapter import Chapter
 
 class Subchapter(Base):
     __tablename__ = 'subchapter'

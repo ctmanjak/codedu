@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.mysql import INTEGER, VARCHAR
 
 from look.model.base import Base
+from look.model.board import Board
 
 class Chapter(Base):
     __tablename__ = 'chapter'
@@ -11,4 +12,4 @@ class Chapter(Base):
     parent_board_id = Column(INTEGER(unsigned=True), ForeignKey('board.id'), nullable=False)
     title = Column(VARCHAR(32), nullable=False)
 
-    subchapter = relationship('Subchapter')
+    subchapter = relationship('Subchapter', cascade="all, delete, delete-orphan")

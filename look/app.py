@@ -1,13 +1,13 @@
 import falcon.asgi
 
-from look.db import init_db, insert_dummy_data
+from look.db import init_db, insert_dummy_data, truncate_table
 from look.socket import TerminalNamespace, init_socket
 from look.api import auth, db
 from look.middleware.jsontranslator import JSONTranslator
 from look.middleware.dbmanager import DBManager
 from look.middleware.socketmanager import SocketManager
 
-db_session = init_db()
+db_session, engine = init_db()
 
 middleware = [
     JSONTranslator(),
@@ -19,14 +19,22 @@ socket, sio = init_socket(app)
 sio.register_namespace(TerminalNamespace('/', sio))
 app.add_middleware(SocketManager(sio))
 
+app.req_options.strip_url_path_trailing_slash = True
+
 class RootPage(object):
     async def on_get(self, req, res):
-        res.body = "Hello, World!"
-    
-    async def on_post(self, req, res):
+        res.body = "codedu"
+
+class DBControl(object):
+    async def on_post(self, req, res, table):
         insert_dummy_data(db_session())
 
+    async def on_delete(self, req, res, table):
+        truncate_table(db_session(), engine, table)
+
 app.add_route('/', RootPage())
+
+app.add_route('/test/db/{table}', DBControl())
 
 app.add_route('/api/auth/check', auth.Check())
 app.add_route('/api/auth/register', auth.Register())

@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.mysql import INTEGER, VARCHAR
 
 from look.model.base import Base
+from look.model.subchapter import Subchapter
 
 _learning_progress = Table('learning_progress', Base.metadata,
     Column('user_id', INTEGER(unsigned=True), ForeignKey('user.id')),
@@ -19,4 +20,4 @@ class User(Base):
     exp = Column(INTEGER(unsigned=True), nullable=False, default=0)
     user_img = Column(VARCHAR(128))
 
-    learning_progress = relationship('Subchapter', secondary=_learning_progress)
+    learning_progress = relationship('Subchapter', secondary=_learning_progress, cascade="all, delete")
