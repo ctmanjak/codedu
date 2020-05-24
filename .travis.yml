@@ -1,12 +1,17 @@
 language: python
+
 python:
   - "3.6"      # current default Python on Travis CI
 # command to install dependencies
+
+services:
+  - mysql
+  
+before_install:
+  - mysql -e 'CREATE DATABASE codedu;'
+
 install:
   - pip install -r requirements.txt
 # command to run tests
 script:
   - pytest test
-
-services:
-  - mysql

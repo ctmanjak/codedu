@@ -1,5 +1,5 @@
 import traceback
-
+import os
 from hashlib import sha256
 
 from sqlalchemy import create_engine
@@ -8,9 +8,11 @@ from sqlalchemy.orm import sessionmaker
 from look.config import Config
 from look.model.base import Base
 
+is_travis = 'TRAVIS' in os.environ
+
 def init_db():
     print("init_db")
-    engine = create_engine(f"mysql+mysqldb://{Config.DB_USER}:{Config.DB_PASSWORD}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_NAME}?charset=utf8")
+    engine = create_engine(f"mysql+mysqldb://{Config.DB_USER}{':'+Config.DB_PASSWORD if not is_travis else ''}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_NAME}?charset=utf8")
 
     db_session = sessionmaker(bind=engine)
 
