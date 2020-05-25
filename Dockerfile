@@ -14,6 +14,7 @@ RUN wget https://www.python.org/ftp/python/3.6.9/Python-3.6.9.tgz -O /tmp/Python
 WORKDIR /codedu
 ADD ./config   /codedu/config
 ADD ./look   /codedu/look
+ADD ./test   /codedu/test
 ADD ./docker-compose.yml   /codedu/docker-compose.yml 
 ADD ./requirements.txt   /codedu/requirements.txt
 
