@@ -42,7 +42,7 @@ class Login(object):
                     'username':data['username'],
                     'iat':datetime.datetime.utcnow(),
                     # 'exp':datetime.datetime.utcnow() + datetime.timedelta(seconds=30),
-                }, Config.secret, algorithm='HS256')
+                }, Config.SECRET_KEY, algorithm='HS256')
                 
                 res.status = HTTP_200
                 res.body = json.dumps({

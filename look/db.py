@@ -1,9 +1,12 @@
 import traceback
 import os
+import sys
+from time import sleep
 from hashlib import sha256
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import OperationalError
 
 from look.config import Config
 from look.model.base import Base
@@ -12,11 +15,24 @@ is_travis = 'TRAVIS' in os.environ
 
 def init_db():
     print("init_db")
-    engine = create_engine(f"mysql+mysqldb://{Config.DB_USER}{':'+Config.DB_PASSWORD if not is_travis else ''}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_NAME}?charset=utf8")
+    
+    for i in range(15):
+        try:
+            engine = create_engine(f"mysql+mysqldb://{Config.DB_USER}{':'+Config.DB_PASSWORD if not is_travis else ''}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_NAME}?charset=utf8")
+            
+            db_session = sessionmaker(bind=engine)
 
-    db_session = sessionmaker(bind=engine)
-
-    Base.metadata.create_all(bind=engine)
+            Base.metadata.create_all(bind=engine)
+        except OperationalError as e:
+            pass
+        except:
+            print("Unknow Error in init_db")
+        else:
+            break
+        sleep(2)
+    else:
+        print("Can't connect to MySQL server")
+        sys.exit(0)
 
     return db_session, engine
 

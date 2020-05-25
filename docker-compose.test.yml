@@ -1,0 +1,58 @@
+version: '3'
+volumes:
+  codedu_db: {}
+  
+services:
+  db:
+    image: mariadb
+    volumes:
+      - codedu_db:/var/lib/mysql
+      - ./config/mariadb-default.cnf:/etc/mysql/mariadb.conf.d/default.cnf
+    environment:
+      - MYSQL_DATABASE=codedu
+      - MYSQL_ROOT_PASSWORD=root
+    logging:
+      driver: none
+
+  server:
+    image: codedu_server
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: codedu
+      DB_USER: root
+      DB_PASSWORD: root
+      SECRET_KEY: codedu
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+    expose:
+      - "8000"
+    command: ["uvicorn", "look.app:socket", "--reload", "--host", "0"]
+    volumes:
+      - ./:/codedu/
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./config/nginx-default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    logging:
+      driver: none
+  
+  sut:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: ["pytest", "test"]
+    depends_on:
+      - db
+      - server
+      - nginx
