@@ -1,2 +1,2 @@
 export DB_HOST='db'
-pytest test
+pytest /codedu/test
