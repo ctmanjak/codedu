@@ -18,7 +18,5 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile-test
-    volumes:
-      - ./test.sh:/codedu/test.sh
     depends_on:
       - db
