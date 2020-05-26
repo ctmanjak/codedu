@@ -15,7 +15,7 @@ is_travis = 'TRAVIS' in os.environ
 
 def init_db():
     print("init_db")
-    
+    print(Config.DB_USER, Config.DB_PASSWORD, Config.DB_HOST, Config.DB_PORT, Config.DB_NAME, is_travis)
     for i in range(15):
         try:
             engine = create_engine(f"mysql+mysqldb://{Config.DB_USER}{':'+Config.DB_PASSWORD if not is_travis else ''}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_NAME}?charset=utf8")
@@ -32,7 +32,7 @@ def init_db():
         sleep(2)
     else:
         print("Can't connect to MySQL server")
-        sys.exit(0)
+        sys.exit(1)
 
     return db_session, engine
 

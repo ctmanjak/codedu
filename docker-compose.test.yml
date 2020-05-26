@@ -37,6 +37,8 @@ services:
       LANG: C.UTF-8
       PYTHONUNBUFFERED: 0
     command: ["pytest", "test"]
+    links:
+      - db
 
 networks:
   test:
