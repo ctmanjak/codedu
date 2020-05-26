@@ -1,3 +1,4 @@
+import os
 import json
 import falcon
 from falcon import testing
@@ -13,7 +14,7 @@ def client():
 # pytest will inject the object returned by the "client" function
 # as an additional parameter.
 def test_root(client):
-    doc = 'codedu'
+    doc = "HOSTNAME: " + os.environ.get('HOSTNAME', 'codedu')
 
     response = client.simulate_get('/')
     result_doc = response.content.decode()

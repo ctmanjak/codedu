@@ -1,12 +1,12 @@
 version: '3'
 volumes:
-  codedu_db: {}
+  codedu_test_db: {}
   
 services:
   db:
     image: mariadb
     volumes:
-      - codedu_db:/var/lib/mysql
+      - codedu_test_db:/var/lib/mysql
       - ./config/mariadb-default.cnf:/etc/mysql/mariadb.conf.d/default.cnf
     environment:
       - MYSQL_DATABASE=codedu
@@ -29,6 +29,5 @@ services:
       SECRET_KEY: codedu
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
-    expose:
-      - "8000"
+      PYTHONUNBUFFERED: 0
     command: ["pytest", "test"]
