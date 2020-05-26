@@ -20,4 +20,4 @@ services:
       dockerfile: ./Dockerfile-falcon
     depends_on:
       - db
-    command: ["DB_HOST=db", "pytest", "test"]
+    command: ["bash", "test.sh"]
