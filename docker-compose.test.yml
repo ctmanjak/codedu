@@ -5,6 +5,10 @@ volumes:
 services:
   db:
     image: mariadb
+    networks:
+      test:
+        aliases:
+          - test_db
     volumes:
       - codedu_test_db:/var/lib/mysql
       - ./config/mariadb-default.cnf:/etc/mysql/mariadb.conf.d/default.cnf
@@ -18,10 +22,12 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile-falcon
+    networks:
+      - test
     depends_on:
       - db
     environment:
-      DB_HOST: db
+      DB_HOST: test_db
       DB_PORT: 3306
       DB_NAME: codedu
       DB_USER: root
@@ -31,5 +37,6 @@ services:
       LANG: C.UTF-8
       PYTHONUNBUFFERED: 0
     command: ["pytest", "test"]
-    links:
-      - db
+
+networks:
+  test:
