@@ -8,4 +8,6 @@ ADD ./config   /codedu/config
 ADD ./look   /codedu/look
 ADD ./test   /codedu/test
 
-CMD ["DB_HOST=db", "pytest", "test"]
+RUN export DB_HOST=db
+
+CMD ["pytest", "test"]
