@@ -5,10 +5,6 @@ volumes:
 services:
   mariadb:
     image: mariadb
-    networks:
-      codedu_net:
-        aliases:
-          - db
     volumes:
       - codedu_db:/var/lib/mysql
       - ./config/mariadb-default.cnf:/etc/mysql/mariadb.conf.d/default.cnf
@@ -25,14 +21,10 @@ services:
       dockerfile: ./Dockerfile-falcon
     deploy:
       replicas: 2
-    networks:
-      codedu_net:
-        aliases:
-          - falcon
     depends_on:
       - mariadb
     environment:
-      DB_HOST: db
+      DB_HOST: mariadb
       DB_PORT: 3306
       DB_NAME: codedu
       DB_USER: root
@@ -40,22 +32,14 @@ services:
       SECRET_KEY: codedu
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
-      PYTHONUNBUFFERED: 0
+      PYTHONUNBUFFERED:
     command: ["uvicorn", "look.app:socket", "--host", "0"]
 
   nginx:
     image: nginx
-    networks:
-      codedu_net:
-        aliases:
-          - nginx
     volumes:
       - ./config/nginx-default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "80:80"
     depends_on:
       - falcon
-
-networks:
-  codedu_net:
-    external: true

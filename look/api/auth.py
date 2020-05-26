@@ -37,7 +37,7 @@ class Login(object):
         except NoResultFound:
             raise HTTPBadRequest(description="USERNAME NOT FOUND")
         else:
-            if db_data.password == data['password']:
+            if db_data.password == sha256(data['password'].encode()).hexdigest():
                 encoded_jwt = jwt.encode({
                     'username':data['username'],
                     'iat':datetime.datetime.utcnow(),

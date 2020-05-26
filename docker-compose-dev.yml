@@ -3,7 +3,7 @@ volumes:
   codedu_db-dev: {}
   
 services:
-  db-dev:
+  mariadb-dev:
     image: mariadb
     volumes:
       - codedu_db-dev:/var/lib/mysql
@@ -15,13 +15,14 @@ services:
       driver: none
 
   falcon-dev:
+    image: codedu_server-dev:falcon
     build:
       context: .
       dockerfile: ./Dockerfile-dev
     depends_on:
-      - db-dev
+      - mariadb-dev
     environment:
-      DB_HOST: db-dev
+      DB_HOST: mariadb-dev
       DB_PORT: 3306
       DB_NAME: codedu
       DB_USER: root
@@ -29,9 +30,7 @@ services:
       SECRET_KEY: codedu
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
-      PYTHONUNBUFFERED: 0
-    expose:
-      - "8000"
+      PYTHONUNBUFFERED:
     command: ["uvicorn", "look.app:socket", "--reload", "--host", "0"]
     volumes:
       - ./:/codedu/
@@ -44,5 +43,3 @@ services:
       - "80:80"
     depends_on:
       - falcon-dev
-    logging:
-      driver: none
