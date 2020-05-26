@@ -20,6 +20,5 @@
 .venv/
 **/__pycache__
 todo.txt
-run.sh
 **/*.bak
 .git/

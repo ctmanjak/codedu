@@ -1,3 +1,4 @@
+import os
 import falcon.asgi
 
 from look.db import init_db, insert_dummy_data, truncate_table
@@ -23,7 +24,7 @@ app.req_options.strip_url_path_trailing_slash = True
 
 class RootPage(object):
     async def on_get(self, req, res):
-        res.body = "codedu"
+        res.body = "HOSTNAME: " + os.environ.get('HOSTNAME', 'codedu')
 
 class DBControl(object):
     async def on_post(self, req, res, table):
