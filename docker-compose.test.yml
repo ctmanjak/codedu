@@ -17,9 +17,8 @@ services:
   sut:
     build:
       context: .
-      dockerfile: ./Dockerfile-falcon
+      dockerfile: ./Dockerfile-test
     volumes:
       - ./test.sh:/codedu/test.sh
     depends_on:
       - db
-    command: ["bash", "/codedu/test.sh"]

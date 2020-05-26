@@ -1,0 +1,11 @@
+FROM ctmanjak/codedu_base
+
+WORKDIR /codedu
+ADD ./requirements.txt   /codedu/requirements.txt
+RUN pip3 install -r requirements.txt
+
+ADD ./config   /codedu/config
+ADD ./look   /codedu/look
+ADD ./test   /codedu/test
+
+CMD ["DB_HOST=db", "pytest", "test"]
