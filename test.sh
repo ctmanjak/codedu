@@ -1,2 +1,1 @@
-export DB_HOST='db'
-pytest /codedu/test
+DB_HOST=db pytest /codedu/test
