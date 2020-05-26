@@ -8,6 +8,6 @@ ADD ./config   /codedu/config
 ADD ./look   /codedu/look
 ADD ./test   /codedu/test
 
-RUN export DB_HOST=db
+ADD ./config/config-test.py /codedu/look/config.py
 
 CMD ["pytest", "test"]
