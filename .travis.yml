@@ -17,14 +17,7 @@ install:
 script:
 - pytest test
 after_success:
-  - provider: script
-    script: bash image_build latest
-    on:
-      branch: master
-  - provider: script
-    script: bash image_build dev
-    on:
-      branch: dev
+  - bash image_build.sh
 deploy:
   provider: script
   script: bash docker-deploy.sh $TARGET_IP
