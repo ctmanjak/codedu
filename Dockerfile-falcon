@@ -5,4 +5,3 @@ ADD ./requirements.txt   /codedu/requirements.txt
 RUN pip3 install -r requirements.txt
 
 ADD ./look   /codedu/look
-ADD ./test   /codedu/test

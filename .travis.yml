@@ -16,8 +16,17 @@ install:
 - pip install -r requirements.txt
 script:
 - pytest test
-before_deploy:
-- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+after_success:
+  - provider: script
+    script: bash image_build latest
+    on:
+      branch: master
+  - provider: script
+    script: bash image_build dev
+    on:
+      branch: dev
 deploy:
   provider: script
-  script: sudo bash docker-deploy.sh $TARGET_IP
+  script: bash docker-deploy.sh $TARGET_IP
+  on:
+    branch: master
