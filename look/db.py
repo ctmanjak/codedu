@@ -16,7 +16,7 @@ def init_db():
 
     for i in range(15):
         try:
-            engine = create_engine(f"mysql+mysqldb://{Config.DB_USER}{':'+Config.DB_PASSWORD if Config.DB_PASSWORD else ''}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_NAME}?charset=utf8")
+            engine = create_engine(f"mysql+mysqldb://{Config.DB_USER}{':'+Config.DB_PASSWORD if not Config.DB_PASSWORD=='travis' else ''}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_NAME}?charset=utf8")
             
             db_session = sessionmaker(bind=engine)
 
