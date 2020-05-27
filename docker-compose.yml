@@ -7,7 +7,9 @@ services:
     image: mariadb
     volumes:
       - codedu_db:/var/lib/mysql
-      - ./config/mariadb-default.cnf:/etc/mysql/mariadb.conf.d/default.cnf
+    configs:
+      - source: mariadb_conf
+      - target: /etc/mysql/mariadb.conf.d/default.cnf
     environment:
       - MYSQL_DATABASE=codedu
       - MYSQL_ROOT_PASSWORD=root
@@ -51,9 +53,16 @@ services:
 
   nginx:
     image: nginx
-    volumes:
-      - ./config/nginx-default.conf:/etc/nginx/conf.d/default.conf
+    configs:
+      - source: nginx_conf
+      - target: /etc/nginx/conf.d/default.conf
     ports:
       - "80:80"
     depends_on:
       - falcon
+
+configs:
+  mariadb_conf:
+    file: ./config/mariadb-default.cnf
+  nginx_conf:
+    file: ./config/nginx-default.conf
