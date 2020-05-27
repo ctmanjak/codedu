@@ -1,4 +1,4 @@
-sudo echo '{ "insecure-registries":["15.165.181.246:5000"] }' >> /etc/docker/daemon.json
+echo '{ "insecure-registries":["15.165.181.246:5000"] }' >> /etc/docker/daemon.json
 
 docker build -t 15.165.181.246:5000/codedu_server:falcon -f Dockerfile-falcon .
 

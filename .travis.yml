@@ -20,4 +20,4 @@ script:
 
 deploy:
   provider: script
-  script: bash docker-deploy.sh
+  script: sudo bash docker-deploy.sh
