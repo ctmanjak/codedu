@@ -29,7 +29,7 @@ def init_db():
             break
         sleep(2)
     else:
-        print(Config.DB_HOST, Config.DB_PORT, Config.DB_USER, Config.DB_PASSWORD)
+        print(Config.DB_HOST, Config.DB_PORT, Config.DB_USER, Config.DB_PASSWORD, os.environ["DB_PASSWORD"])
         print("Can't connect to MySQL server")
         sys.exit(1)
 
