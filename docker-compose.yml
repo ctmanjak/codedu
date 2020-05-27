@@ -1,9 +1,9 @@
-version: '3.7'
+version: '3'
 volumes:
   codedu_db: {}
   
 services:
-  db:
+  mariadb:
     image: mariadb
     volumes:
       - codedu_db:/var/lib/mysql
@@ -31,14 +31,10 @@ services:
         delay: 10s
         order: stop-first
         failure_action: rollback
-      rollback_config:
-        parallelism: 1
-        delay: 10s
-        order: stop-first
     depends_on:
-      - db
+      - mariadb
     environment:
-      DB_HOST: db
+      DB_HOST: mariadb
       DB_PORT: 3306
       DB_NAME: codedu
       DB_USER: root
