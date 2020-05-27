@@ -15,7 +15,7 @@ services:
       driver: none
 
   falcon:
-    image: 15.165.181.246:5000/codedu_server:falcon
+    image: ctmanjak/codedu_server:falcon
     build:
       context: .
       dockerfile: ./Dockerfile-falcon

@@ -1,4 +1,4 @@
-FROM 15.165.181.246:5000/codedu_base
+FROM ctmanjak/codedu_base
 
 WORKDIR /codedu
 ADD ./requirements.txt   /codedu/requirements.txt
