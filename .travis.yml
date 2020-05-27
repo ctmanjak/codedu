@@ -10,7 +10,8 @@ services:
   - docker
 
 before_install:
-  - sudo cat /etc/docker/daemon.json
+  - sudo ls -al /etc/docker
+  - sudo echo '{ "insecure-registries":["15.165.181.246:5000"] }' > /etc/docker/daemon.json
   - mysql -e 'CREATE DATABASE codedu;'
 
 install:
@@ -20,7 +21,6 @@ script:
   - pytest test
 
 before_deploy:
-  - sudo echo '{ "insecure-registries":["15.165.181.246:5000"] }' > /etc/docker/daemon.json
   - sudo systemctl restart docker
 
 deploy:
