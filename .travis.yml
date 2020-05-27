@@ -10,9 +10,6 @@ services:
   - docker
 
 before_install:
-  - sudo rm -f /etc/docker/daemon.json
-  - sudo ls -al /etc/docker/
-  - sudo cp ./config/daemon-test.json /etc/docker/daemon.json
   - mysql -e 'CREATE DATABASE codedu;'
 
 install:
@@ -22,6 +19,7 @@ script:
   - pytest test
 
 before_deploy:
+  - sudo cp -f ./config/daemon-test.json /etc/docker/daemon.json
   - sudo systemctl restart docker
 
 deploy:
