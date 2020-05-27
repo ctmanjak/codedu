@@ -24,7 +24,7 @@ def init_db():
         except OperationalError as e:
             pass
         except:
-            print("Unknow Error in init_db")
+            print("Unknown Error in init_db")
         else:
             break
         sleep(2)
@@ -181,3 +181,6 @@ def insert_dummy_data(db_session):
     except:
         traceback.print_exc()
         db_session.rollback()
+
+if __name__ = '__main__':
+    init_db()
