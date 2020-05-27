@@ -5,7 +5,7 @@ services:
 - mysql
 - docker
 before_install:
-- mysql -uroot -e 'CREATE DATABASE codedu;'
+- mysql -e 'CREATE DATABASE codedu;'
 install:
 - pip install -r requirements.txt
 script:
