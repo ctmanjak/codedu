@@ -1,29 +1,23 @@
 language: python
 python:
-  - '3.6'
-
+- '3.6'
 env:
   global:
-    - "DB_PASSWORD=travis"
-    - secure: qc0dVdDaZbrUGq1zejtU+cIZy74KUsA00W4IQXISg9Jz7CtIJnKbzYPdZ+Av7qT8bG5MirOB5LgIJISyxkwpOvnICSYjPXkSjhhMAyoAbeAy5ByYwIXAi1NAt8+jePEDLPAaiFLlhzLLrS7NiOsGiSb18e8TkL+0NECLy1jDB631oz4VBBbjJzdlYT8Bc9Ut3bJOR7pDPGyxIonviWXzFIYH5wKgvVLzRAPHkI03i+Vbln6XG6l5ikjxA/Q1XlVAqp9EtDfOpYJt3VbjrLb55G9LyYw9nu0M1ygSd3Yk1W19ZzT6Z5OJ+lWLKQcaJZkwPmXmZvZ3i0/bHghIVmEwR1C7CPoEZ4xSf93JFxHzGafYPlhEHiu3EmeEcQDpRw/R67Lot1qcQJI4L5EPVr+StECNbvEzwxEPKA9PsSkxktwGF4Ndrop0YbeFkPfWs9Q9hSUY9qS0mq5A22SmqwZy0JyLje0eYWqWlyh4CYc6Bf8ikHV6wDkEX1eiR/vbYXAGUZ8omWbFsE03KqGVFLV9XqQCMy32OMxwGCSd3gjhDGV8nvTYYGVCndRFlICuFI9TfRbT4n/qMsEOHZnl0/UPKXD8xftYNsxr9pXvlF7ib0tUW3gFVH9HFL8Mncwo2AUeOZZt4JUMGs3e99VAv/hvInpTEQXwB6y0sdmpCjoiEJE=
-
+  - DB_PASSWORD=travis
+  - secure: qc0dVdDaZbrUGq1zejtU+cIZy74KUsA00W4IQXISg9Jz7CtIJnKbzYPdZ+Av7qT8bG5MirOB5LgIJISyxkwpOvnICSYjPXkSjhhMAyoAbeAy5ByYwIXAi1NAt8+jePEDLPAaiFLlhzLLrS7NiOsGiSb18e8TkL+0NECLy1jDB631oz4VBBbjJzdlYT8Bc9Ut3bJOR7pDPGyxIonviWXzFIYH5wKgvVLzRAPHkI03i+Vbln6XG6l5ikjxA/Q1XlVAqp9EtDfOpYJt3VbjrLb55G9LyYw9nu0M1ygSd3Yk1W19ZzT6Z5OJ+lWLKQcaJZkwPmXmZvZ3i0/bHghIVmEwR1C7CPoEZ4xSf93JFxHzGafYPlhEHiu3EmeEcQDpRw/R67Lot1qcQJI4L5EPVr+StECNbvEzwxEPKA9PsSkxktwGF4Ndrop0YbeFkPfWs9Q9hSUY9qS0mq5A22SmqwZy0JyLje0eYWqWlyh4CYc6Bf8ikHV6wDkEX1eiR/vbYXAGUZ8omWbFsE03KqGVFLV9XqQCMy32OMxwGCSd3gjhDGV8nvTYYGVCndRFlICuFI9TfRbT4n/qMsEOHZnl0/UPKXD8xftYNsxr9pXvlF7ib0tUW3gFVH9HFL8Mncwo2AUeOZZt4JUMGs3e99VAv/hvInpTEQXwB6y0sdmpCjoiEJE=
+  - DOCKER_USERNAME=ctmanjak
+  - secure: oaK0iTKBHbzuzLSsgcEHWhPNa6NKOqpdGEnQA50a0msr1piF9DCLoX9KECuoN6vDBhzpoTWwJ0AiER73yChuHrtqobqniecdDqa0RXT6oZGm+c5KedS1mMjkD185uYCCVtnfetxN7tppeYTCpg0BYJdRLCtTnSzldz17GlhwwV5grsbaNcZ5sjcd1pV2b1V2UXkkz791c1fuOuAq4WR5zQdu0TaqAn2+1k9MHbfAqJQh9rCCAowpb5MRYWLMy2A7t1jTU8O6XsHlz4rUzry4bTWlPZ6qiJf4qItsg9q2aO1eUFPnsLcPxbN65lY+F70byUmH7k3RDigtUR9/jHEGP4sUHlQk0I9QKvqVTxwp9sG3YiQusEUOLQn7Pa3r7w3U9G20Js3Bu0DksrNiHTfNb2g4EPNjQYcJmKioe3P4JqOgSeMEpPToMxLvJqLB683wW8yjxk01W/FE/febcM6DQP3vy5CTf3P0APHwIKhNIHElcdmpKWCypQu2FF3OTRIjuefW2RtHOeSmDOVzegMxid6FSMBaHP1bunbdqxPyItg4a1kEnULR6xpgnJVbu9DOpUpyMbndXoVwW6MKSO5SRHWofLt05gIbtRXoFczCSiNlUAVTAY7koL45hSlEefSeFB1MgMT7DwpJK6E4vO3+FTa+I/BtyocZV7PHVZ8vm0I=
 services:
-  - mysql
-  - docker
-
+- mysql
+- docker
 before_install:
-  - mysql -e 'CREATE DATABASE codedu;'
-
+- mysql -e 'CREATE DATABASE codedu;'
 install:
-  - pip install -r requirements.txt
-
+- pip install -r requirements.txt
 script:
-  - pytest test
-
+- pytest test
 before_deploy:
-  - sudo cp -f ./config/daemon-test.json /etc/docker/daemon.json
-  - sudo systemctl restart docker
-
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 deploy:
   provider: script
   script: sudo bash docker-deploy.sh $TARGET_IP
