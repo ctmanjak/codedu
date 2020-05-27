@@ -9,7 +9,7 @@ services:
       - codedu_db:/var/lib/mysql
     configs:
       - source: mariadb_conf
-      - target: /etc/mysql/mariadb.conf.d/default.cnf
+        target: /etc/mysql/mariadb.conf.d/default.cnf
     environment:
       - MYSQL_DATABASE=codedu
       - MYSQL_ROOT_PASSWORD=root
@@ -55,7 +55,7 @@ services:
     image: nginx
     configs:
       - source: nginx_conf
-      - target: /etc/nginx/conf.d/default.conf
+        target: /etc/nginx/conf.d/default.conf
     ports:
       - "80:80"
     depends_on:
