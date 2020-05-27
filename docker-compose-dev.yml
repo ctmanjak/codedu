@@ -15,7 +15,7 @@ services:
       driver: none
 
   falcon-dev:
-    image: codedu_server-dev:falcon
+    image: ctmanjak/codedu_falcon:dev
     build:
       context: .
       dockerfile: ./Dockerfile-dev

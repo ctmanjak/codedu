@@ -15,7 +15,7 @@ services:
       - MYSQL_ROOT_PASSWORD=root
 
   falcon:
-    image: ctmanjak/codedu_server:falcon
+    image: ctmanjak/codedu_falcon:latest
     build:
       context: .
       dockerfile: ./Dockerfile-falcon
