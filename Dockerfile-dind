@@ -1,0 +1,8 @@
+FROM docker:dind
+
+WORKDIR /codedu
+ADD ./config /codedu/config
+ADD ./docker-compose.yml /codedu/docker-compose.yml
+ADD ./setup_server.sh /codedu/setup_server.sh
+
+# CMD ["sh", "setup_server.sh"]

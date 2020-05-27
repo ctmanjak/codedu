@@ -1,6 +1,7 @@
 FROM ctmanjak/codedu_base:docker
 
 WORKDIR /codedu
-ADD ./   /codedu/
+ADD ./config   /codedu/config
+ADD ./docker-compose.yml /codedu/config
 
-CMD ["sh", "run.sh"]
+CMD ["docker", "stack", "deploy", "-c", "docker-compose.yml", "codedu"]
