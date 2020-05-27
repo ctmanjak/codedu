@@ -1,25 +1,20 @@
 language: python
-
 python:
-  - "3.6"      # current default Python on Travis CI
-# command to install dependencies
-
+- '3.6'
 services:
-  - mysql
-  - docker
-
+- mysql
+- docker
 addons:
   mariadb: '10.1'
-  
 before_install:
-  - mysql -e 'CREATE DATABASE codedu;'
-
+- mysql -e 'CREATE DATABASE codedu;'
 install:
-  - pip install -r requirements.txt
-# command to run tests
+- pip install -r requirements.txt
 script:
-  - pytest test
-
+- pytest test
 deploy:
   provider: script
   script: bash docker-deploy.sh
+env:
+  global:
+    secure: iSjRtkXNYgN5AdjOszaOIFwj2H+ptLa2d096LyjHqO8KU8SnN9DoRXlKAhbR/YAD8Rjb0AkuJA/MNB0IQ6xTjoL6W0I6v4TXpqF5id7FRQupCxkIcO55fNB8kzx/RVXuqNpLKqJ5RLkc4724JUXFr99bsrxWyuyVMpKiIUy7QY76YOKZ+/bF5PUEepBI1LOWoxVIqRBiKEsYNXfl1LG7soiLfMditk23F2YMmOl8r1AaZjX1fj2i5KhbRIzzFI9qkMXyJF0rlIxrnoyXWkh8RM6MXODdCnVkvkDhsZL8gjW4mOho0powxtcJ+ErKIJfJfmzDzQpBGAUghISWnA/nPBBj//MHUQ/+16Uz5KmpNqiZDwFa79+jWz6TFhdO9R2B4xrkMizZfSGbL146aZiuyAUnWiAsenyKUVbBG68OlaxdwqOeAPWRU2RMpe0mnUuAO95aRWkWmG9VanoH0CC7hnzluASqTBxSKg7qfvbjL+yp2tD0t4DG3n7ltulNKvzosaLTs2vKF5+O6ALy4XyCiuyY+zidSOr1D4E8rcv1lHlRjQr032SYLZtxGEqNi1P8k28sa1OtsjKeMQjfVQ2tdJ5/5M8Z2nawfWJ7Mh1QcNpT7HDohqWQ48XmEKvZDQYJbv0AKOalF9NDqtZTnJlqtY1aya6MN0vETeeOd+K0apw=
