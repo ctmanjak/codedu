@@ -21,6 +21,17 @@ services:
       dockerfile: ./Dockerfile-falcon
     deploy:
       replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+        max_failure_ratio: 3
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+        max_failure_ratio: 3
     depends_on:
       - mariadb
     environment:
