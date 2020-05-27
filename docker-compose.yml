@@ -13,8 +13,6 @@ services:
     environment:
       - MYSQL_DATABASE=codedu
       - MYSQL_ROOT_PASSWORD=root
-    logging:
-      driver: none
 
   falcon:
     image: ctmanjak/codedu_server:falcon
