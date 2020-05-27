@@ -1,18 +1,23 @@
 language: python
 python:
-- '3.6'
+  - '3.6'
+  
+env:
+  - "DB_PASSWORD=travis"
+
 services:
-- mysql
-- docker
+  - mysql
+  - docker
+
 before_install:
-- mysql -e 'CREATE DATABASE codedu;'
+  - mysql -e 'CREATE DATABASE codedu;'
+
 install:
-- pip install -r requirements.txt
+  - pip install -r requirements.txt
+
 script:
-- pytest test
+  - pytest test
+
 deploy:
   provider: script
   script: bash docker-deploy.sh
-env:
-  global:
-  - DB_PASSWORD=travis
