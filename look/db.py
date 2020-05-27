@@ -181,6 +181,3 @@ def insert_dummy_data(db_session):
     except:
         traceback.print_exc()
         db_session.rollback()
-
-if __name__ = '__main__':
-    init_db()
