@@ -5,6 +5,7 @@ python:
 # command to install dependencies
 
 services:
+  - mysql
   - docker
 
 addons:
