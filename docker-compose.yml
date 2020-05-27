@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.7'
 volumes:
   codedu_db: {}
   
@@ -31,6 +31,10 @@ services:
         delay: 10s
         order: stop-first
         failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
     depends_on:
       - mariadb
     environment:

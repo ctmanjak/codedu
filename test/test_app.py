@@ -14,8 +14,8 @@ def client():
 # pytest will inject the object returned by the "client" function
 # as an additional parameter.
 def test_root(client):
-    doc = "HOSTNAME: " + os.environ.get('HOSTNAME', 'codedu')
-
+    doc = "codedu"
+    
     response = client.simulate_get('/')
     result_doc = response.content.decode()
 

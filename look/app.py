@@ -24,7 +24,11 @@ app.req_options.strip_url_path_trailing_slash = True
 
 class RootPage(object):
     async def on_get(self, req, res):
-        res.body = "hiHOSTNAME: " + os.environ.get('HOSTNAME', 'codedu')
+        res.body = "codedu"
+
+class TestPage(object):
+    async def on_get(self, req, res):
+        res.body = "HOSTNAME: " + os.environ.get('HOSTNAME', 'codedu')
 
 class DBControl(object):
     async def on_post(self, req, res, table):
@@ -34,6 +38,7 @@ class DBControl(object):
         truncate_table(db_session(), engine, table)
 
 app.add_route('/', RootPage())
+app.add_route('/test', TestPage())
 
 app.add_route('/test/db/{table}', DBControl())
 
