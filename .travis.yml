@@ -18,6 +18,10 @@ install:
 script:
   - pytest test
 
+before_deploy:
+  - sudo echo '{ "insecure-registries":["15.165.181.246:5000"] }' >> /etc/docker/daemon.json
+  - sudo systemctl restart docker
+
 deploy:
   provider: script
   script: sudo bash docker-deploy.sh
