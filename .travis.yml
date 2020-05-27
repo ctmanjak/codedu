@@ -4,8 +4,6 @@ python:
 services:
 - mysql
 - docker
-addons:
-  mariadb: '10.1'
 before_install:
 - mysql -uroot -e 'CREATE DATABASE codedu;'
 install:
