@@ -11,7 +11,7 @@ addons:
   mariadb: '10.1'
   
 before_install:
-  - mariadb -e 'CREATE DATABASE codedu;'
+  - mysql -e 'CREATE DATABASE codedu;'
 
 install:
   - pip install -r requirements.txt
