@@ -10,6 +10,7 @@ services:
   - docker
 
 before_install:
+  - sudo ls /etc/docker/
   - mysql -e 'CREATE DATABASE codedu;'
 
 install:
