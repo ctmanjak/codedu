@@ -50,7 +50,10 @@ services:
       - source: nginx_conf
         target: /etc/nginx/conf.d/default.conf
     ports:
-      - "80:80"
+      - mode: host
+        protocol: tcp
+        published: 80
+        target: 80
     depends_on:
       - falcon
 
