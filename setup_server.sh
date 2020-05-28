@@ -12,6 +12,8 @@ tmp_file="$HOME/docker-override.conf"
 
 SYSTEMD_EDITOR="cp $tmp_file" systemctl edit docker
 
+systemctl restart docker
+
 rm $tmp_file
 
 docker swarm init

@@ -21,11 +21,6 @@ services:
       dockerfile: ./Dockerfile-falcon
     deploy:
       replicas: 2
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 30s
       update_config:
         parallelism: 1
         delay: 10s
