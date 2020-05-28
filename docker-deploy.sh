@@ -10,6 +10,19 @@ if nc -z -w5 $TARGET_IP 2375; then
     export MARIADB_CONF_VER=$(md5sum ./config/mariadb_default.cnf | awk '{print $1}')
     export NGINX_CONF_VER=$(md5sum ./config/nginx_default.conf | awk '{print $1}')
 
+    DOCKER_COMPOSE_VER=$(md5sum ./docker/docker-compose.yml | awk '{print $1}')
+
+    PREV_DOCKER_COMPOSE=$(sudo docker config ls | grep -m1 -oP 'docker-compose-[^\s]+')
+    CURRENT_DOCKER_COMPOSE="docker-compose-${DOCKER_COMPOSE_VER}"
+
+    if [ ! $PREV_DOCKER_COMPOSE = $CURRENT_DOCKER_COMPOSE ]; then
+        docker config create $CURRENT_DOCKER_COMPOSE ./docker/docker-compose.yml
+        docker stack deploy -c ./docker/docker-compose.yml codedu
+        if [ $PREV_DOCKER_COMPOSE ]; then
+            docker config rm $PREV_DOCKER_COMPOSE
+        fi
+    fi
+
     if docker stack ls | grep -wq "codedu"; then
         PREV_MARIADB_CONF=$(docker service inspect codedu_mariadb | grep -m1 -oP '\"ConfigName\": "\K[^"]+' | uniq)
         PREV_NGINX_CONF=$(docker service inspect codedu_nginx | grep -m1 -oP '\"ConfigName\": "\K[^"]+' | uniq)
