@@ -6,11 +6,20 @@ if [ $1 ]; then
 fi
 
 if nc -z -w5 $TARGET_IP 2375; then
-    MARIADB_CONF_VER=$(md5sum ./config/mariadb-default.cnf | awk '{print $1}')
-    NGINX_CONF_VER=$(md5sum ./config/nginx-default.conf | awk '{print $1}')
+    export DOCKER_HOST=tcp://${TARGET_IP}:2375
+    export MARIADB_CONF_VER=$(md5sum ./config/mariadb_default.cnf | awk '{print $1}')
+    export NGINX_CONF_VER=$(md5sum ./config/nginx_default.conf | awk '{print $1}')
 
-    DOCKER_HOST=tcp://${TARGET_IP}:2375 \
-    MARIADB_CONF_VER=$MARIADB_CONF_VER \
-    NGINX_CONF_VER=$NGINX_CONF_VER \
+    # if docker stack ls | grep -w "codedu"; then
+    #     if ! docker config ls | grep -w "mariadb_conf-${MARIADB_CONF_VER}"; then
+    #         PREV_MARIADB_CONF=$(docker service inspect codedu_mariadb | grep -oP '\"ConfigName\": "\K[^"]+' | uniq)
+
+    #         docker config create "mariadb_conf-${MARIADB_CONF_VER}" ./config/mariadb_default.cnf
+    #         docker service update --config--rm $PREV_MARIADB_CONF codedu_mariadb
+    #     fi
+
+    #     docker service update codedu_falcon
+    # else
     docker stack deploy -c ./docker/docker-compose.yml codedu
+    # fi
 fi
