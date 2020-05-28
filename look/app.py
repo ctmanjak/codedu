@@ -28,7 +28,7 @@ class RootPage(object):
 
 class TestPage(object):
     async def on_get(self, req, res):
-        res.body = "1HOSTNAME: " + os.environ.get('HOSTNAME', 'codedu')
+        res.body = "HOSTNAME: " + os.environ.get('HOSTNAME', 'codedu')
 
 class DBControl(object):
     async def on_post(self, req, res, table):
