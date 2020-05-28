@@ -12,13 +12,16 @@ if nc -z -w5 $TARGET_IP 2375; then
 
     DOCKER_COMPOSE_VER=$(md5sum ./docker/docker-compose.yml | awk '{print $1}')
 
-    PREV_DOCKER_COMPOSE=$(sudo docker config ls | grep -m1 -oP 'docker-compose-[^\s]+')
+    PREV_DOCKER_COMPOSE=$(docker config ls | grep -m1 -oP 'docker-compose-[^\s]+')
+    if [ ! $PREV_DOCKER_COMPOSE ]; then
+        PREV_DOCKER_COMPOSE='not found'
+    fi
     CURRENT_DOCKER_COMPOSE="docker-compose-${DOCKER_COMPOSE_VER}"
 
     if [ ! $PREV_DOCKER_COMPOSE = $CURRENT_DOCKER_COMPOSE ]; then
         docker config create $CURRENT_DOCKER_COMPOSE ./docker/docker-compose.yml
         docker stack deploy -c ./docker/docker-compose.yml codedu
-        if [ $PREV_DOCKER_COMPOSE ]; then
+        if [ ! $PREV_DOCKER_COMPOSE = 'not found' ]; then
             docker config rm $PREV_DOCKER_COMPOSE
         fi
     fi
