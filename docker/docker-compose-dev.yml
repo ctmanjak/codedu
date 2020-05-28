@@ -7,7 +7,7 @@ services:
     image: mariadb
     volumes:
       - codedu_db-dev:/var/lib/mysql
-      - ./config/mariadb-default.cnf:/etc/mysql/mariadb.conf.d/default.cnf
+      - ../config/mariadb-default.cnf:/etc/mysql/mariadb.conf.d/default.cnf
     environment:
       - MYSQL_DATABASE=codedu
       - MYSQL_ROOT_PASSWORD=root
@@ -17,7 +17,7 @@ services:
   falcon:
     image: ctmanjak/codedu_falcon:dev
     build:
-      context: .
+      context: ..
       dockerfile: ./Dockerfile-dev
     depends_on:
       - mariadb
@@ -33,12 +33,12 @@ services:
       PYTHONUNBUFFERED:
     command: ["uvicorn", "look.app:socket", "--reload", "--host", "0"]
     volumes:
-      - ./:/codedu/
+      - ../:/codedu/
 
   nginx:
     image: nginx
     volumes:
-      - ./config/nginx-default.conf:/etc/nginx/conf.d/default.conf
+      - ../config/nginx-default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "80:80"
     depends_on:

@@ -12,5 +12,5 @@ if nc -z -w5 $TARGET_IP 2375; then
     DOCKER_HOST=tcp://${TARGET_IP}:2375 \
     MARIADB_CONF_VER=$MARIADB_CONF_VER \
     NGINX_CONF_VER=$NGINX_CONF_VER \
-    docker stack deploy -c docker-compose.yml codedu
+    docker stack deploy -c ./docker/docker-compose.yml codedu
 fi

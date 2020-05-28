@@ -17,7 +17,7 @@ services:
   falcon:
     image: ctmanjak/codedu_falcon:latest
     build:
-      context: .
+      context: ..
       dockerfile: ./Dockerfile-falcon
     deploy:
       replicas: 2
@@ -57,7 +57,7 @@ services:
 configs:
   mariadb_conf:
     name: mariadb_conf-${MARIADB_CONF_VER}
-    file: ./config/mariadb-default.cnf
+    file: ../config/mariadb-default.cnf
   nginx_conf:
     name: nginx_conf-${NGINX_CONF_VER}
-    file: ./config/nginx-default.conf
+    file: ../config/nginx-default.conf
