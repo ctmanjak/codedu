@@ -5,7 +5,7 @@ if dpkg -s docker-ce | grep -q "Status: install ok installed" &&\
    dpkg -s containerd.io | grep -q "Status: install ok installed" &&\
    dpkg -s docker-compose | grep -q "Status: install ok installed";
 then
-    echo "already installed"
+    echo "docker is already installed"
     exit 1
 else
     apt-get update

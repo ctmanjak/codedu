@@ -1,5 +1,7 @@
 #!/bin/sh
 
+sh install_docker.sh
+
 ip4=$(hostname -I | awk '{print $1}')
 
 tmp_file="$HOME/docker-override.conf"
