@@ -9,7 +9,7 @@ pwd
 
 ls -al
 
-ls -al .dpl
+ls -al ~
 
 if [[ -f ca.pem && -f cert.pem && -f key.pem ]]; then
     if nc -zw3 "${TARGET_IP}" 2376; then
