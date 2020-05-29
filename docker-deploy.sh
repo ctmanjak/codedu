@@ -67,5 +67,9 @@ if [ -f secrets.tar ]; then
         else
             docker stack deploy -c ./docker/docker-compose.yml codedu
         fi
+    else
+        echo "TARGET_IP is closed"
     fi
+else
+    echo "secrets.tar not found"
 fi
