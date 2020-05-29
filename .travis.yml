@@ -14,6 +14,7 @@ services:
 - docker
 before_install:
 - mysql -e 'CREATE DATABASE codedu;'
+# - openssl aes-256-cbc -K $encrypted_*_key -iv $encrypted_*_iv -in secrets.tar.enc -out secrets.tar -d
 install:
 - pip install -r requirements.txt
 script:
