@@ -5,6 +5,8 @@ if [ "${1}" ]; then
     TARGET_IP=$1
 fi
 
+ls -al
+
 if [[ -f ca.pem && -f cert.pem && -f key.pem ]]; then
     if nc -zw3 "${TARGET_IP}" 2376; then
         export DOCKER_HOST="tcp://${TARGET_IP}:2376"
