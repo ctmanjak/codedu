@@ -24,10 +24,7 @@ script:
 after_success:
   - bash image_build.sh
 deploy:
-  file:
-    - ca.pem
-    - cert.pem
-    - key.pem
+  skip_cleanup: true
   provider: script
   script: bash docker-deploy.sh $TARGET_IP
   on:

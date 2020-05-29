@@ -67,5 +67,5 @@ if [[ -f ca.pem && -f cert.pem && -f key.pem ]]; then
         echo "TARGET_IP is closed"
     fi
 else
-    echo "secrets.tar not found"
+    echo "cert files not found"
 fi
