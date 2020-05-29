@@ -34,15 +34,34 @@ if [ -d "/etc/docker" ]; then
     chmod -v 0400 ca-key.pem key.pem server-key.pem
     chmod -v 0444 ca.pem server-cert.pem cert.pem
 
+    if [ ! -d ~/.docker ]; then
+        mkdir ~/.docker
+    fi
+    cp {ca,cert,key}.pem ~/.docker/
+
     tar cvf ../secrets.tar ca.pem cert.pem key.pem
     echo "copy secrets.tar to dev-client and encrypting secrets.tar with travis for continuous deployment"
     echo "secrets.tar should be in {project_path}/docker/"
     echo "more info about encrypting file with travis in https://docs.travis-ci.com/user/encrypting-files/"
+    echo "\nyou need run\n
+    export DOCKER_HOST=tcp://${HOSTNAME}:2376 DOCKER_TLS_VERIFY=1\n
+    or add it to ~/.bashrc for access docker"
 
-    if [ ! -f "/etc/docker/daemon.json" ]; then
-        echo "{\"hosts\":[\"tcp://0.0.0.0:2376\"],\"tls\":true,\"tlsverify\":true,\"tlscacert\":\"$(pwd)/ca.pem\",\"tlscert\":\"$(pwd)/server-cert.pem\",\"tlskey\":\"$(pwd)/server-key.pem\"}" > /etc/docker/daemon.json
+    path_dj="/etc/docker/daemon.json"
+    daemon_json="\"hosts\":[\"tcp://0.0.0.0:2376\"],\"tls\":true,\"tlsverify\":true,\"tlscacert\":\"$(pwd)/ca.pem\",\"tlscert\":\"$(pwd)/server-cert.pem\",\"tlskey\":\"$(pwd)/server-key.pem\""
+    if [ ! -f "${path_dj}" ]; then
+        echo "{${daemon_json}}" > ${path_dj}
+        systemctl restart docker
     else
-        echo '/etc/docker/daemon.json already exists.'
+        path_dj=
+        echo '${path_dj} already exists.'
+        echo "add\n
+        ${daemon_json}\n
+        to ${path_dj}\n
+        ex) {\"some-key\":\"some-value\"} ->\n
+            {\"some-key\":\"some-value\", ${daemon_json}}\n
+        if ${path_dj} is empty, just put {${daemon_json}}"
+        echo "lastly, restart docker service"
     fi
 else
     echo 'is docker installed?'
