@@ -5,7 +5,7 @@ if [ "${1}" ]; then
     TARGET_IP=$1
 fi
 
-if [ -f docker/secrets.tar ]; then
+if [ -f secrets.tar ]; then
     if nc -zw3 "${TARGET_IP}" 2376; then
         export DOCKER_HOST="tcp://${TARGET_IP}:2376"
         export DOCKER_TLS_VERIFY=1
