@@ -1,21 +1,19 @@
-#!/bin/sh
+#!/bin/bash
 
 sh install_docker.sh
 
-ip4=$(hostname -I | awk '{print $1}')
+# tmp_file="$HOME/docker-override.conf"
 
-tmp_file="$HOME/docker-override.conf"
+# {
+#     echo "[Service]"; 
+#     echo "ExecStart=";
+#     echo "ExecStart=/usr/bin/dockerd;
+# } >$tmp_file
 
-{
-    echo "[Service]"; 
-    echo "ExecStart=";
-    echo "ExecStart=/usr/bin/dockerd -H tcp://${ip4}:2375 -H unix:///var/run/docker.sock";
-} >$tmp_file
+# SYSTEMD_EDITOR="cp $tmp_file" systemctl edit docker
 
-SYSTEMD_EDITOR="cp $tmp_file" systemctl edit docker
+# systemctl restart docker
 
-systemctl restart docker
-
-rm $tmp_file
+# rm $tmp_file
 
 docker swarm init

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if dpkg -s docker-ce | grep -q "Status: install ok installed" &&\
    dpkg -s docker-ce-cli | grep -q "Status: install ok installed" &&\

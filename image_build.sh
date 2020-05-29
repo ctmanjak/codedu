@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ $TRAVIS_BRANCH == "dev" ]; then
     TAG="dev"

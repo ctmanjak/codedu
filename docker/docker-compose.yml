@@ -41,7 +41,7 @@ services:
       SECRET_KEY: codedu
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
-      PYTHONUNBUFFERED:
+      PYTHONUNBUFFERED: 0
     command: ["uvicorn", "look.app:socket", "--host", "0", "--proxy-headers"]
 
   nginx:
