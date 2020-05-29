@@ -14,13 +14,13 @@ if [ -f docker/secrets.tar ]; then
 
         DOCKER_COMPOSE_VER=$(md5sum ./docker/docker-compose.yml | awk '{print $1}')
 
-        if [ -d docker ]; then
-            if [[ -f ca.pem && -f cert.pem && -f key.pem ]]; then
-                if [ ! -d ~/.docker ]; then
-                    mkdir ~/.docker
-                fi
-                cp docker/{ca,cert,key}.pem ~/.docker/
+        tar xvf secrets.tar
+
+        if [[ -f ca.pem && -f cert.pem && -f key.pem ]]; then
+            if [ ! -d ~/.docker ]; then
+                mkdir ~/.docker
             fi
+            cp {ca,cert,key}.pem ~/.docker/
         fi
 
         PREV_DOCKER_COMPOSE=$(docker config ls | grep -m1 -oP 'docker-compose-[^\s]+')

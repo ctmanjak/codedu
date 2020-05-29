@@ -23,3 +23,4 @@ todo.txt
 run.sh
 **/*.bak
 **/*.ign
+**/secrets.tar
