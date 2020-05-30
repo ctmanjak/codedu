@@ -21,5 +21,6 @@
 **/__pycache__
 todo.txt
 **/*.bak
-**/*.ign
+**/ign-*
+**/secrets.tar
 .git/

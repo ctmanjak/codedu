@@ -1,7 +1,7 @@
 import json
 
 from look.hook.authmanager import validate_token
-from look.model.base import Base
+from look.model import Base
 
 from falcon import HTTP_200, before, HTTPBadRequest, HTTPInternalServerError
 from falcon.uri import parse_query_string
@@ -54,7 +54,7 @@ class Collection(object):
         
         return result
 
-    async def select_data(self, db_session, table, col_list=[], depth=0):
+    async def select_data(self, db_session, table, col_list=[], depth=0, print_parent=False):
         await find_model(self, table, col_list)
 
         result = {
@@ -67,7 +67,7 @@ class Collection(object):
 
         if db_data:
             result["success"] = True
-            result["data"] = [json.loads(row.get_data(self.attrs, depth=depth)) for row in db_data]
+            result["data"] = [row.get_data(self.attrs, depth=depth, print_parent=print_parent) for row in db_data]
         else:
             result["description"] = "NO RESULT FOUND"
 
@@ -88,17 +88,19 @@ class Collection(object):
     async def on_get(self, req, res, table):
         db_session = req.context['db_session']
         depth = 0
+        print_parent = False
 
         if req.query_string:
             query = parse_query_string(req.query_string)
-
             if 'depth' in query:
                 try:
                     depth = int(query['depth'])
                 except ValueError:
                     pass
+            if 'print_parent' in query:
+                print_parent = True
 
-        result = await self.select_data(db_session, table, depth=depth)
+        result = await self.select_data(db_session, table, depth=depth, print_parent=print_parent)
 
         if result and "success" in result:
             if result["success"]:
@@ -125,7 +127,7 @@ class Item(object):
             result["description"] = "UNKNOWN ERROR"
         else:
             result["success"] = True
-            result["data"] = json.loads(db_data.get_data(self.attrs, depth=depth))
+            result["data"] = db_data.get_data(self.attrs, depth=depth)
         
         return result
 

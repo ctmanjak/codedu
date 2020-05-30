@@ -1,6 +1,7 @@
 import traceback
 import os
 import sys
+import time
 from time import sleep
 from hashlib import sha256
 
@@ -9,11 +10,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 
 from look.config import Config
-from look.model.base import Base
+from look.model import Base
 
 def init_db():
     print("init_db")
-
+    
     for i in range(15):
         try:
             engine = create_engine(
@@ -138,7 +139,7 @@ def insert_dummy_data(db_session):
         },
         "board" : {
             "target" : "chapter",
-            "rel_name" : "chapter",
+            "rel_name" : "chapters",
             "data" : [
                 [1, 1],
                 [1, 2],
@@ -148,7 +149,7 @@ def insert_dummy_data(db_session):
         },
         "chapter" : {
             "target" : "subchapter",
-            "rel_name" : "subchapter",
+            "rel_name" : "subchapters",
             "data" : [
                 [1, 1],
                 [1, 2],

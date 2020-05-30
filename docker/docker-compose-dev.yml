@@ -18,7 +18,7 @@ services:
     image: ctmanjak/codedu_falcon:dev
     build:
       context: ..
-      dockerfile: ./Dockerfile-dev
+      dockerfile: ./docker/Dockerfile-dev
     depends_on:
       - mariadb
     environment:
@@ -30,7 +30,7 @@ services:
       SECRET_KEY: codedu
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
-      PYTHONUNBUFFERED:
+      PYTHONUNBUFFERED: 0
     command: ["uvicorn", "look.app:socket", "--reload", "--host", "0"]
     volumes:
       - ../:/codedu/

@@ -1,15 +1,14 @@
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.dialects.mysql import INTEGER, VARCHAR
 
-from look.model.base import Base
-from look.model.board import Board
+from . import Base
 
 class Chapter(Base):
     __tablename__ = 'chapter'
 
     id = Column(INTEGER(unsigned=True), primary_key=True)
-    parent_board_id = Column(INTEGER(unsigned=True), ForeignKey('board.id'), nullable=False)
     title = Column(VARCHAR(32), nullable=False)
 
-    subchapter = relationship('Subchapter', cascade="all, delete, delete-orphan")
+    board_id = Column(INTEGER(unsigned=True), ForeignKey("board.id"))
+    board = relationship('Board', backref=backref('chapters', order_by=id, cascade="all, delete"), cascade="all, delete")

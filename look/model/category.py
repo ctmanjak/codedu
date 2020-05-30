@@ -1,13 +1,8 @@
-from sqlalchemy import Column, Table, ForeignKey
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.mysql import INTEGER, VARCHAR
 
-from look.model.base import Base
-
-category_board = Table('category_board', Base.metadata,
-    Column('category_id', INTEGER(unsigned=True), ForeignKey('category.id')),
-    Column('board_id', INTEGER(unsigned=True), ForeignKey('board.id')),
-)
+from . import Base
 
 class Category(Base):
     __tablename__ = 'category'
@@ -16,4 +11,10 @@ class Category(Base):
     title = Column(VARCHAR(64), nullable=False)
     subtitle = Column(VARCHAR(128), nullable=False)
 
-    board = relationship('Board', secondary=category_board, cascade="all, delete")
+    boards = relationship('Board', backref="categories", secondary="category_board", cascade="all, delete")
+
+class CategoryBoard(Base):
+    __tablename__ = 'category_board'
+
+    category_id = Column(INTEGER(unsigned=True), ForeignKey("category.id"), primary_key=True)
+    board_id = Column(INTEGER(unsigned=True), ForeignKey("board.id"), primary_key=True)

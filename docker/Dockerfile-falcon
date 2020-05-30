@@ -1,7 +1,7 @@
 FROM ctmanjak/codedu_base
 
 WORKDIR /codedu
-ADD ../requirements.txt   /codedu/requirements.txt
+ADD ./requirements.txt   /codedu/requirements.txt
 RUN pip3 install -r requirements.txt
 
-ADD ../look   /codedu/look
+ADD ./look   /codedu/look

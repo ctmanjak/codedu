@@ -13,12 +13,16 @@ services:
     environment:
       - MYSQL_DATABASE=codedu
       - MYSQL_ROOT_PASSWORD=root
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
 
   falcon:
     image: ctmanjak/codedu_falcon:latest
     build:
       context: ..
-      dockerfile: ./Dockerfile-falcon
+      dockerfile: ./docker/Dockerfile-falcon
     deploy:
       replicas: 2
       update_config:
@@ -54,6 +58,10 @@ services:
         protocol: tcp
         published: 80
         target: 80
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
     depends_on:
       - falcon
 

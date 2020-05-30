@@ -2,8 +2,8 @@ import os
 import falcon.asgi
 
 from look.db import init_db, insert_dummy_data, truncate_table
-from look.socket import TerminalNamespace, init_socket
-from look.api import auth, db
+from look.terminal import TerminalNamespace, init_socket
+from look.api import auth, db, schema
 from look.middleware.jsontranslator import JSONTranslator
 from look.middleware.dbmanager import DBManager
 from look.middleware.socketmanager import SocketManager
@@ -39,6 +39,8 @@ class DBControl(object):
 
 app.add_route('/', RootPage())
 app.add_route('/test', TestPage())
+
+app.add_route('/api/schema', schema.Collection())
 
 app.add_route('/test/db/{table}', DBControl())
 

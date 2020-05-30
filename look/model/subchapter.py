@@ -1,12 +1,14 @@
 from sqlalchemy import Column, ForeignKey
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.dialects.mysql import INTEGER, VARCHAR
 
-from look.model.base import Base
-from look.model.chapter import Chapter
+from . import Base
 
 class Subchapter(Base):
     __tablename__ = 'subchapter'
 
     id = Column(INTEGER(unsigned=True), primary_key=True)
-    parent_chapter_id = Column(INTEGER(unsigned=True), ForeignKey('chapter.id'), nullable=False)
     title = Column(VARCHAR(32), nullable=False)
+
+    chapter_id = Column(INTEGER(unsigned=True), ForeignKey("chapter.id"))
+    chapter = relationship('Chapter', backref=backref('subchapters', order_by=id, cascade="all, delete"), cascade="all, delete")
