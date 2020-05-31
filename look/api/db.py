@@ -1,4 +1,5 @@
 import json
+from hashlib import sha256
 
 from look.hook.authmanager import validate_token
 from look.model import Base
