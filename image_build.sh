@@ -1,9 +1,10 @@
 #!/bin/bash
 
-if [ $TRAVIS_BRANCH == "dev" ]; then
-    TAG="dev"
-elif [ $TRAVIS_BRANCH == "master" ]; then
+
+if [ $TRAVIS_BRANCH == "master" ]; then
     TAG="latest"
+# elif [ $TRAVIS_BRANCH == "dev" ]; then
+#     TAG="dev"
 fi
 
 if [ $TAG ] && [ $DOCKER_PASSWORD ] && [ $DOCKER_USERNAME ]; then

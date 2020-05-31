@@ -11,11 +11,9 @@ services:
     environment:
       - MYSQL_DATABASE=codedu
       - MYSQL_ROOT_PASSWORD=root
-    logging:
-      driver: none
 
   falcon:
-    image: ctmanjak/codedu_falcon:dev
+    image: codedu_server:dev
     build:
       context: ..
       dockerfile: ./docker/Dockerfile-dev

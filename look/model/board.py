@@ -2,7 +2,7 @@ from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.mysql import INTEGER, VARCHAR
 
-from .base import Base
+from . import Base
 
 class Board(Base):
     __tablename__ = 'board'

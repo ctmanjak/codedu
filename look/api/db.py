@@ -31,6 +31,8 @@ class Collection(object):
             "description" : "",
             "data" : {},
         }
+        
+        if 'password' in data: data['password'] = sha256(data['password'].encode()).hexdigest()
         print(self.model.__tablename__, data)
         if data:
             try:
@@ -38,18 +40,7 @@ class Collection(object):
             except TypeError as e:
                 result["description"] = "INVALID PARAMETER"
             else:
-                try:
-                    db_session.commit()
-                except IntegrityError:
-                    db_session.rollback()
-                    result["description"] = "INTEGRITY ERROR"
-                except OperationalError:
-                    db_session.rollback()
-                    result["description"] = "OPERATIONAL ERROR"
-                except:
-                    result["description"] = "UNKNOWN ERROR"
-                else:
-                    result["success"] = True
+                result["success"] = True
         else: result["description"] = "DATA NOT FOUND"
         
         return result
@@ -110,7 +101,7 @@ class Collection(object):
         else: raise HTTPInternalServerError()
 
 class Item(object):
-    async def select_data(self, db_session, table, id, col_list=[], depth=0):
+    async def select_data(self, db_session, table, id_, col_list=[], depth=0):
         await find_model(self, table, col_list)
 
         result = {
@@ -120,7 +111,7 @@ class Item(object):
         }
 
         try:
-            db_data = db_session.query(self.model).filter(self.model.id == id).one()
+            db_data = db_session.query(self.model).filter(self.model.id == id_).one()
         except NoResultFound:
             result["description"] = "NO RESULT FOUND"
         except:
@@ -132,7 +123,7 @@ class Item(object):
         return result
 
     @before(validate_token, is_async=True)
-    async def on_get(self, req, res, table, id):
+    async def on_get(self, req, res, table, id_):
         db_session = req.context['db_session']
         depth = 0
 
@@ -145,7 +136,7 @@ class Item(object):
                 except ValueError:
                     pass
 
-        result = await self.select_data(db_session, table, id, depth=depth)
+        result = await self.select_data(db_session, table, id_, depth=depth)
 
         if result and "success" in result:
             if result["success"]:

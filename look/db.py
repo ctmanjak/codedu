@@ -1,7 +1,7 @@
-import traceback
 import os
 import sys
 import time
+from traceback import print_exc
 from time import sleep
 from hashlib import sha256
 
@@ -29,6 +29,7 @@ def init_db():
             pass
         except:
             print("Unknown Error in init_db")
+            print_exc()
         else:
             break
         sleep(2)
@@ -183,5 +184,5 @@ def insert_dummy_data(db_session):
     try:
         db_session.commit()
     except:
-        traceback.print_exc()
+        print_exc()
         db_session.rollback()

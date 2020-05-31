@@ -1,3 +1,4 @@
+import json
 import datetime
 import collections
 
@@ -20,10 +21,12 @@ class BaseModel(object):
             parents = [type(self)]
         else:
             parents.append(type(self))
-        
+
+        relationship_keys = self.__mapper__.relationships.keys()
+
         if not col_list:
             col_list = self.__table__.columns.keys()
-            for relationship in self.__mapper__.relationships.keys():
+            for relationship in relationship_keys:
                 col_list.append(relationship)
                 
         tmp = {}
@@ -31,13 +34,15 @@ class BaseModel(object):
             column = getattr(self, arg)
             if not issubclass(type(column), self.__class__.__bases__[0]):
                 if column and type(column) == InstrumentedList:
-                    tmp[arg] = []
+                    tmp_obj_ls = []
                     if depth > 0:
-                        tmp[arg] = [obj.get_data(depth=depth-1, print_parent=print_parent, parents=list(parents)) for obj in column if not type(obj) in parents]
+                        tmp_obj_ls = [obj.get_data(depth=depth-1, print_parent=print_parent, parents=list(parents)) for obj in column if not type(obj) in parents]
                     elif depth == -1:
-                        tmp[arg] = [obj.get_data(depth=depth, print_parent=print_parent, parents=list(parents)) for obj in column if not type(obj) in parents]
+                        tmp_obj_ls = [obj.get_data(depth=depth, print_parent=print_parent, parents=list(parents)) for obj in column if not type(obj) in parents]
+                    if tmp_obj_ls: tmp[arg] = tmp_obj_ls
                 else:
-                    tmp[arg] = str(column) if type(column) == datetime.datetime else column
+                    if not arg in relationship_keys:
+                        tmp[arg] = str(column) if type(column) == datetime.datetime else column
             elif print_parent:
                 tmp[arg] = column.get_data(depth=0, print_parent=print_parent, parents=list(parents))
         return tmp
@@ -46,6 +51,6 @@ class BaseModel(object):
         cols = self.__table__.columns.keys()
         for relationship in self.__mapper__.relationships.keys():
             cols.append(relationship)
-        return self.get_data(cols)
+        return json.dumps(self.get_data(cols))
 
 Base = declarative_base(cls=BaseModel)
