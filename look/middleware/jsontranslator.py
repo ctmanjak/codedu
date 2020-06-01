@@ -15,4 +15,4 @@ class JSONTranslator(object):
                 except json.decoder.JSONDecodeError as e:
                     raise HTTPBadRequest(description="JSON Decode Error")
         else:
-            req.context['data'] = None
+            req.context['data'] = {}
