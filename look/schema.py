@@ -1,6 +1,7 @@
 import json
+import jwt
 import graphene
-from datetime import datetime
+import datetime
 from hashlib import sha256
 
 from falcon.uri import parse_query_string
@@ -12,6 +13,7 @@ from graphene.types.json import JSONString
 from graphene_sqlalchemy.converter import convert_sqlalchemy_type
 from graphene_sqlalchemy.registry import Registry
 
+from look.config import Config
 from look.model import Base, User as UserModel
 
 from sqlalchemy import func
@@ -29,8 +31,6 @@ def init_schema():
                     "model": model,
                 }),
             })
-
-    query_attr = {}
 
     def resolve_model(self, info, model, **kwargs):
         query = model.get_query(info)
@@ -76,7 +76,7 @@ def init_schema():
         query = model.get_query(info)
         model = model._meta.model
         data = kwargs.get('data', None)
-        data["modified"] = datetime.utcnow()
+        data["modified"] = datetime.datetime.utcnow()
         if 'password' in data: data['password'] = sha256(data['password'].encode()).hexdigest()
         
         instance = get_instance_by_pk(query, model, data)
@@ -91,41 +91,81 @@ def init_schema():
         data = kwargs.get('data', None)
         
         instance = get_instance_by_pk(query, model, data)
-        
         tmp_instance = instance.one()
+
         instance.delete()
 
         return cls(**{model.__tablename__:tmp_instance})
 
-    def create_mutataion_attr(control_name, mutate_func):
-        return type(f"{control_name}{tablename}", (graphene.Mutation,), {
-            "Arguments": type("Arguments", (), {
-                f"data": input_classes[tablename](),
-            }),
-            tablename: graphene.Field(model),
-            "mutate": classmethod(lambda cls, _, info, model=model, **kwargs: mutate_func(cls, info=info, model=model, **kwargs)),
-        }).Field()
+    def login_mutate(cls, info, model=None, **kwargs):
+        query = model.get_query(info)
+        model = model._meta.model
+        data = kwargs.get('data', None)
 
+        if 'username' in data and 'password' in data:
+            user = query.filter(model.username == data['username']).one()
+
+            if user.password == sha256(data['password'].encode()).hexdigest():
+                encoded_jwt = jwt.encode({
+                    'username':data['username'],
+                    'iat':datetime.datetime.utcnow(),
+                    # 'exp':datetime.datetime.utcnow() + datetime.timedelta(seconds=30),
+                }, Config.SECRET_KEY, algorithm='HS256')
+
+        return cls(**{'user':user, 'token': encoded_jwt.decode()})
+
+    def create_input_class(classname, fields):
+        return type(classname,
+            (graphene.InputObjectType,),
+            dict(map(lambda x: (x[0], x[1]), fields.items())),
+        )
+
+    def create_mutation_field(classname, model, mutate_func, input_class, additional_fields={}):
+        tablename = model._meta.model.__table__.fullname
+        tmp_field = additional_fields
+        tmp_field["Arguments"] = type("Arguments", (), {
+            "data": input_class(),
+        })
+        tmp_field[tablename] = graphene.Field(model)
+        tmp_field["mutate"] = classmethod(lambda cls, _, info, model=model, **kwargs: mutate_func(cls, info, model, **kwargs))
+        
+        return type(classname, (graphene.Mutation,), tmp_field).Field()
+
+    query_field = {}
     tmp_class = {}
-    mutation_attr = {}
+    mutation_field = {}
     input_classes = {}
-    print(models)
+    
     for tablename, model in models.items():
         fields = {}
         for colname, column in model._meta.model.__table__.columns.items():
-            fields[colname] = convert_sqlalchemy_type(getattr(column, 'type', None), column)
+            if not colname == 'created' and not colname == 'modified':
+                fields[colname] = convert_sqlalchemy_type(getattr(column, 'type', None), column)()
         
-        query_attr[tablename] = graphene.List(model, **(dict(a for a in map(lambda x: (x[0], graphene.Argument(x[1])), fields.items()))))
-        query_attr[f"resolve_{tablename}"] = lambda self, info, model=model, **kwargs: resolve_model(self, info, model, **kwargs)
+        query_field[tablename] = graphene.List(model, **(dict(a for a in map(lambda x: (x[0], graphene.Argument(type(x[1]))), fields.items()))))
+        query_field[f"resolve_{tablename}"] = lambda self, info, model=model, **kwargs: resolve_model(self, info, model, **kwargs)
 
-        input_classes[tablename] = type(f"{tablename}Input", (graphene.InputObjectType,), dict(a for a in map(lambda x: (x[0], x[1]()), fields.items())))
+        input_classes[tablename] = create_input_class(f"{tablename}Input", fields)
 
-        mutation_attr[f"create_{tablename}"] = create_mutataion_attr("create", create_mutate)
-        mutation_attr[f"update_{tablename}"] = create_mutataion_attr("update", update_mutate)
-        mutation_attr[f"delete_{tablename}"] = create_mutataion_attr("delete", delete_mutate)
+        mutation_field[f"create_{tablename}"] = create_mutation_field(f"Create{tablename}", model, create_mutate, input_classes[tablename])
+        mutation_field[f"update_{tablename}"] = create_mutation_field(f"Update{tablename}", model, update_mutate, input_classes[tablename])
+        mutation_field[f"delete_{tablename}"] = create_mutation_field(f"Delete{tablename}", model, delete_mutate, input_classes[tablename])
 
-    Query = type("Query", (graphene.ObjectType,), query_attr)
-    MyMutations = type("MyMutations", (graphene.ObjectType,), mutation_attr)
+    mutation_field["register"] = mutation_field["create_user"]
+    mutation_field["login"] = create_mutation_field("Login",
+        models['user'],
+        login_mutate,
+        create_input_class('LoginInput', {
+            'username': graphene.String(),
+            'password': graphene.String(),
+        }),
+        {
+            'token': graphene.String(),
+        },
+    )
+    
+    Query = type("Query", (graphene.ObjectType,), query_field)
+    MyMutations = type("MyMutations", (graphene.ObjectType,), mutation_field)
     return {'query': Query, 'mutation': MyMutations}
 
 schema = graphene.Schema(**init_schema())
