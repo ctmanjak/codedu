@@ -11,61 +11,58 @@ from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.orm.exc import NoResultFound
 
 async def find_model(self, table, col_list=None):
-    self.model = Base._decl_class_registry.get(table[0].upper()+table[1:], None)
+    result = {
+        "success" : False,
+        "description" : "",
+        "data" : {},
+    }
 
-    if not self.model:
-        for model in Base._decl_class_registry.values():
-            if hasattr(model, '__table__') and model.__table__.fullname == table:
-                self.model = model
+    self.model = Base._decl_class_registry.get(table[0].upper()+table[1:], None)
     
-    if hasattr(self, 'model') and not col_list == None:
-        if not col_list:
-            self.attrs = self.model.__table__.columns.keys()
-            for relationship in self.model.__mapper__.relationships.keys():
-                self.attrs.append(relationship)
-        else:
-            self.attrs = col_list
+    if self.model:
+        if not col_list == None:
+            if not col_list:
+                self.attrs = self.model.__table__.columns.keys()
+                for relationship in self.model.__mapper__.relationships.keys():
+                    self.attrs.append(relationship)
+            else:
+                self.attrs = col_list
+        result["success"] = True
+    else: result["description"] = "TABLE NOT FOUND"
+
+    return result
 
 
 class Collection(object):
     async def insert_data(self, db_session, table, data):
-        await find_model(self, table)
+        result = await find_model(self, table)
         
-        result = {
-            "success" : False,
-            "description" : "",
-            "data" : {},
-        }
-        
-        if 'password' in data: data['password'] = sha256(data['password'].encode()).hexdigest()
-        print(self.model.__tablename__, data)
-        if data:
-            try:
-                db_session.add(self.model(**data))
-            except TypeError as e:
-                result["description"] = "INVALID PARAMETER"
+        if result["success"]:
+            if 'password' in data: data['password'] = sha256(data['password'].encode()).hexdigest()
+            print(self.model.__tablename__, data)
+            if data:
+                try:
+                    db_session.add(self.model(**data))
+                except TypeError as e:
+                    result["success"] = False
+                    result["description"] = "INVALID PARAMETER"
             else:
-                result["success"] = True
-        else: result["description"] = "DATA NOT FOUND"
-        
+                result["success"] = False
+                result["description"] = "DATA NOT FOUND"
+            
         return result
 
     async def select_data(self, db_session, table, col_list=[], depth=0, print_parent=False):
-        await find_model(self, table, col_list)
+        result = await find_model(self, table, col_list)
 
-        result = {
-            "success" : False,
-            "description" : "",
-            "data" : {},
-        }
+        if result["success"]:
+            db_data = db_session.query(self.model).all()
 
-        db_data = db_session.query(self.model).all()
-
-        if db_data:
-            result["success"] = True
-            result["data"] = [row.get_data(self.attrs, depth=depth, print_parent=print_parent) for row in db_data]
-        else:
-            result["description"] = "NO RESULT FOUND"
+            if db_data:
+                result["data"] = [row.get_data(self.attrs, depth=depth, print_parent=print_parent) for row in db_data]
+            else:
+                result["success"] = False
+                result["description"] = "NO RESULT FOUND"
 
         return result
     
@@ -107,23 +104,19 @@ class Collection(object):
 
 class Item(object):
     async def select_data(self, db_session, table, id_, col_list=[], depth=0):
-        await find_model(self, table, col_list)
+        result = await find_model(self, table, col_list)
 
-        result = {
-            "success" : False,
-            "description" : "",
-            "data" : {},
-        }
-
-        try:
-            db_data = db_session.query(self.model).filter(self.model.id == id_).one()
-        except NoResultFound:
-            result["description"] = "NO RESULT FOUND"
-        except:
-            result["description"] = "UNKNOWN ERROR"
-        else:
-            result["success"] = True
-            result["data"] = db_data.get_data(self.attrs, depth=depth)
+        if result["success"]:
+            try:
+                db_data = db_session.query(self.model).filter(self.model.id == id_).one()
+            except NoResultFound:
+                result["success"] = False
+                result["description"] = "NO RESULT FOUND"
+            except:
+                result["success"] = False
+                result["description"] = "UNKNOWN ERROR"
+            else:
+                result["data"] = db_data.get_data(self.attrs, depth=depth)
         
         return result
 

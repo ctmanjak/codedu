@@ -21,7 +21,7 @@ class Collection(object):
 
         db_session = req.context['db_session']
         schema = req.context['schema']
-
+        
         result = schema.execute(query, variables=variables, operation_name=operation_name, context_value={'session': db_session, 'search': self.search})
         
         if not result.errors:

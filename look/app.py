@@ -41,14 +41,14 @@ class DBControl(object):
 app.add_route('/', RootPage())
 app.add_route('/test', TestPage())
 
-app.add_route('/api/graphql', db_graphql.Collection(search=False))
-app.add_route('/api/graphql/search', db_graphql.Collection(search=True))
-
 app.add_route('/test/db/{table}', DBControl())
 
 app.add_route('/api/auth/check', auth.Check())
 app.add_route('/api/auth/register', auth.Register())
 app.add_route('/api/auth/login', auth.Login())
 
-app.add_route('/api/{table}', db.Collection())
-app.add_route('/api/{table}/{id}', db.Item())
+app.add_route('/api/db/{table}', db.Collection())
+app.add_route('/api/db/{table}/{id}', db.Item())
+
+app.add_route('/api/graphql', db_graphql.Collection(search=False))
+app.add_route('/api/graphql/search', db_graphql.Collection(search=True))
