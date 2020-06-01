@@ -5,6 +5,14 @@ if [ "${1}" ]; then
     TARGET_IP=$1
 fi
 
+if [ ! -d cert ]; then
+    mkdir cert
+fi
+
+if [[ -f ca.pem && -f cert.pem && -f key.pem ]]; then
+    cp {ca,cert,key}.pem cert/
+fi
+
 if [[ -f cert/ca.pem && -f cert/cert.pem && -f cert/key.pem ]]; then
     if nc -zw3 "${TARGET_IP}" 2376; then
         export DOCKER_HOST="tcp://${TARGET_IP}:2376"
@@ -17,6 +25,7 @@ if [[ -f cert/ca.pem && -f cert/cert.pem && -f cert/key.pem ]]; then
         if [ ! -d ~/.docker ]; then
             mkdir ~/.docker
         fi
+        
         cp cert/{ca,cert,key}.pem ~/.docker/
 
         PREV_DOCKER_COMPOSE=$(docker config ls | grep -m1 -oP 'docker-compose-[^\s]+')
