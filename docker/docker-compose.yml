@@ -19,7 +19,7 @@ services:
           - "node.role==manager"
 
   falcon:
-    image: ctmanjak/codedu_falcon:latest
+    image: ctmanjak/codedu_falcon
     build:
       context: ..
       dockerfile: ./docker/Dockerfile-falcon
@@ -36,7 +36,7 @@ services:
         order: stop-first
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
-      interval: 1m30s
+      interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
