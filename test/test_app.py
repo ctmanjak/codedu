@@ -40,7 +40,7 @@ def test_insert_user(client):
         "password": "testpassword",
     }
 
-    response = client.simulate_post('/api/user', content_type='application/json', body=json.dumps(body))
+    response = client.simulate_post('/api/db/user', content_type='application/json', body=json.dumps(body))
     result_doc = json.loads(response.content.decode())
 
     assert result_doc == doc
