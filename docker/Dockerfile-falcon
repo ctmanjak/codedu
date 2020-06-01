@@ -1,4 +1,4 @@
-FROM ctmanjak/codedu_base
+FROM ctmanjak/codedu_base:latest
 
 WORKDIR /codedu
 ADD ./requirements.txt   /codedu/requirements.txt
