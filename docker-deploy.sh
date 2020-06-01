@@ -58,8 +58,8 @@ if [[ -f cert/ca.pem && -f cert/cert.pem && -f cert/key.pem ]]; then
                     codedu_mariadb --force
             fi
 
-            docker pull ctmanjak/codedu_falcon:latest
-            docker service update codedu_falcon --force --image ctmanjak/codedu_falcon:latest
+            docker pull ctmanjak/codedu_falcon
+            docker service update codedu_falcon --force --image ctmanjak/codedu_falcon
 
             if [ ! "${PREV_NGINX_CONF}" = "${CURRENT_NGINX_CONF}" ]; then
                 if ! docker config ls | grep -wq "${CURRENT_NGINX_CONF}"; then
