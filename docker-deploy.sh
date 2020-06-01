@@ -55,10 +55,10 @@ if [[ -f cert/ca.pem && -f cert/cert.pem && -f cert/key.pem ]]; then
                 docker service update \
                     --config-add "${CURRENT_MARIADB_CONF}" \
                     --config-rm "${PREV_MARIADB_CONF}" \
-                    codedu_mariadb
+                    codedu_mariadb --force
             fi
 
-            docker service update codedu_falcon
+            docker service update codedu_falcon --force
 
             if [ ! "${PREV_NGINX_CONF}" = "${CURRENT_NGINX_CONF}" ]; then
                 if ! docker config ls | grep -wq "${CURRENT_NGINX_CONF}"; then
@@ -67,7 +67,7 @@ if [[ -f cert/ca.pem && -f cert/cert.pem && -f cert/key.pem ]]; then
                 docker service update \
                     --config-add "${CURRENT_NGINX_CONF}" \
                     --config-rm "${PREV_NGINX_CONF}" \
-                    codedu_nginx
+                    codedu_nginx --force
             fi
         else
             docker stack deploy -c ./docker/docker-compose.yml codedu

@@ -34,6 +34,12 @@ services:
         parallelism: 1
         delay: 20s
         order: stop-first
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://falcon:8000"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     depends_on:
       - mariadb
     environment:
