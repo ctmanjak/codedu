@@ -20,8 +20,8 @@ def init_schema():
     print("init_schema")
 
     for model in Base._decl_class_registry.values():
-        if hasattr(model, '__tablename__'):
-            tablename = model.__tablename__
+        if hasattr(model, '__table__'):
+            tablename = model.__table__.fullname
             models[tablename] = type(tablename, (SQLAlchemyObjectType,), {
                 "Meta": type("Meta", (), {
                     "model": model,

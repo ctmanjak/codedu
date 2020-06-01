@@ -11,9 +11,12 @@ from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.orm.exc import NoResultFound
 
 async def find_model(self, table, col_list=None):
-    for model in Base._decl_class_registry.values():
-        if hasattr(model, '__tablename__') and model.__tablename__ == table:
-            self.model = model
+    self.model = Base._decl_class_registry.get(table[0].upper()+table[1:], None)
+
+    if not self.model:
+        for model in Base._decl_class_registry.values():
+            if hasattr(model, '__table__') and model.__table__.fullname == table:
+                self.model = model
     
     if hasattr(self, 'model') and not col_list == None:
         if not col_list:
@@ -22,6 +25,7 @@ async def find_model(self, table, col_list=None):
                 self.attrs.append(relationship)
         else:
             self.attrs = col_list
+
 
 class Collection(object):
     async def insert_data(self, db_session, table, data):
