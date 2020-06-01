@@ -5,7 +5,7 @@ import datetime
 from hashlib import sha256
 
 from look.config import Config
-from look.api import db
+from look.api import db, db_graphql
 from look.model.user import User
 from look.hook.authmanager import validate_token
 
