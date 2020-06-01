@@ -59,7 +59,7 @@ if [[ -f cert/ca.pem && -f cert/cert.pem && -f cert/key.pem ]]; then
             fi
 
             docker pull ctmanjak/codedu_falcon:latest
-            docker service update codedu_falcon --force --image ctmanjak/codedu_falcon:lastest
+            docker service update codedu_falcon --force --image ctmanjak/codedu_falcon:latest
 
             if [ ! "${PREV_NGINX_CONF}" = "${CURRENT_NGINX_CONF}" ]; then
                 if ! docker config ls | grep -wq "${CURRENT_NGINX_CONF}"; then

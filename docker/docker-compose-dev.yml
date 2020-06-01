@@ -13,7 +13,7 @@ services:
       - MYSQL_ROOT_PASSWORD=root
 
   falcon:
-    image: codedu_server:dev
+    image: codedu_falcon:dev
     build:
       context: ..
       dockerfile: ./docker/Dockerfile-dev
