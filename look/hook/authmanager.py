@@ -21,4 +21,4 @@ async def validate_token(req, res, resource, params):
                 'data':decoded_token,
             }
     else:
-        raise HTTPUnauthorized()
+        raise HTTPUnauthorized(description="토큰이 없는뎁쇼")

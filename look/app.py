@@ -3,7 +3,7 @@ import falcon.asgi
 
 from look.db import init_db, insert_dummy_data, truncate_table
 from look.terminal import TerminalNamespace, init_socket
-from look.api import auth, db, db_graphql
+from look.api import auth, db, gql
 from look.middleware.jsontranslator import JSONTranslator
 from look.middleware.dbmanager import DBManager
 from look.middleware.socketmanager import SocketManager
@@ -50,5 +50,5 @@ app.add_route('/api/auth/login', auth.Login())
 app.add_route('/api/db/{table}', db.Collection())
 app.add_route('/api/db/{table}/{id}', db.Item())
 
-app.add_route('/api/graphql', db_graphql.Collection(search=False))
-app.add_route('/api/graphql/search', db_graphql.Collection(search=True))
+app.add_route('/api/graphql', gql.Collection(search=False))
+app.add_route('/api/graphql/search', gql.Collection(search=True))

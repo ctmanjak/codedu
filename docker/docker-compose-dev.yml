@@ -29,6 +29,7 @@ services:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
       PYTHONUNBUFFERED: 0
+      CODEDU_DEV: 1
     healthcheck:
       test: ["CMD", "curl", "-f", "http://falcon:8000"]
       interval: 1m30s

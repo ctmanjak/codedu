@@ -5,7 +5,7 @@ import datetime
 from hashlib import sha256
 
 from look.config import Config
-from look.api import db, db_graphql
+from look.api import db
 from look.model.user import User
 from look.hook.authmanager import validate_token
 
@@ -40,7 +40,9 @@ class Login(object):
             if db_data.password == sha256(data['password'].encode()).hexdigest():
                 encoded_jwt = jwt.encode({
                     'username':data['username'],
+                    'user_id':db_data.id,
                     'iat':datetime.datetime.utcnow(),
+                    'admin':db_data.admin,
                     # 'exp':datetime.datetime.utcnow() + datetime.timedelta(seconds=30),
                 }, Config.SECRET_KEY, algorithm='HS256')
                 

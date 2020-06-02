@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import hmac
 from traceback import print_exc
 from time import sleep
 from hashlib import sha256
@@ -68,6 +69,12 @@ def insert_dummy_data(db_session):
     dummy_data = {
         'user' : [
             {
+                'username':'admin',
+                'email':'admin@codedu.org',
+                'password':'admin',
+                'admin':True,
+            },
+            {
                 'username':'test',
                 'email':'test@gmail.com',
                 'password':'test123!',
@@ -117,7 +124,7 @@ def insert_dummy_data(db_session):
         'subchapter' : [{'title':f'Subchapter{i+1}'} for i in range(8)],
     }
     for data in dummy_data["user"]:
-        data["password"] = sha256(data["password"].encode()).hexdigest()
+        data["password"] = hmac.new(Config.SECRET_KEY.encode(), data['password'].encode(), sha256).hexdigest()
 
     relationships = {
         "user" : {

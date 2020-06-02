@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.mysql import INTEGER, VARCHAR
+from sqlalchemy.dialects.mysql import INTEGER, VARCHAR, BOOLEAN
 
 from . import Base
 
@@ -11,6 +11,7 @@ class User(Base):
     username = Column(VARCHAR(32), nullable=False, unique=True)
     email = Column(VARCHAR(255), nullable=False)
     password = Column(VARCHAR(64), nullable=False)
+    admin = Column(BOOLEAN, nullable=False, default=False)
     exp = Column(INTEGER(unsigned=True), nullable=False, default=0)
     user_img = Column(VARCHAR(128))
 

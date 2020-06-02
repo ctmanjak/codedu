@@ -11,15 +11,16 @@ class Collection(object):
         self.search = search
 
     async def graphql_execute(self, req, res):
-        db_session = req.context['db_session']
-        schema = req.context['schema']
-        data = req.context['data']
+        db_session = req.context.get('db_session', None)
+        schema = req.context.get('schema', None)
+        data = req.context.get('data', {})
+        auth = req.context.get('auth', {})
 
         query = data.get('query', None)
         variables = data.get('variables', None)
         operation_name = data.get('operation_name', None)
 
-        result = schema.execute(query, variables=variables, operation_name=operation_name, context_value={'session': db_session, 'search': self.search})
+        result = schema.execute(query, variables=variables, operation_name=operation_name, context_value={'session': db_session, 'auth': auth, 'search': self.search})
         
         return result
 
