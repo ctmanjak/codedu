@@ -4,6 +4,8 @@ from .category import Category
 from .chapter import Chapter
 from .subchapter import Subchapter
 from .user import User
+from .post import Post
+from .post_comment import PostComment
 
 __all__ = [
     "Base",
@@ -12,4 +14,6 @@ __all__ = [
     "Chapter",
     "Subchapter",
     "User",
+    "Post",
+    "PostComment"
 ]

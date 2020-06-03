@@ -7,18 +7,24 @@ from look.config import Config
 from falcon import HTTP_403, HTTPUnauthorized
 
 async def validate_token(req, res, resource, params):
+    tmp_auth = {
+        'success':False,
+        'description':'OK',
+        'data':"",
+    }
+
     if 'authorization' in req.headers:
         try:
             decoded_token = jwt.decode(req.headers['authorization'], Config.SECRET_KEY, algorithms='HS256')
         except ExpiredSignatureError:
-            raise HTTPUnauthorized(description="만료된 토큰임 ㅋ;")
+            tmp_auth['description'] = "만료된 토큰임 ㅋ;"
         except:
-            raise HTTPUnauthorized(description="잘못된 토큰임 ㅋㅋ")
+            tmp_auth['description'] = "잘못된 토큰임 ㅋㅋ"
         else:
-            req.context['auth'] = {
-                'success':True,
-                'description':'OK',
-                'data':decoded_token,
-            }
+            tmp_auth['success'] = True
+            tmp_auth['data'] = decoded_token
     else:
-        raise HTTPUnauthorized(description="토큰이 없는뎁쇼")
+        tmp_auth['description'] = "토큰이 없는뎁쇼"
+        # raise HTTPUnauthorized(description="토큰이 없는뎁쇼")
+
+    req.context['auth'] = tmp_auth

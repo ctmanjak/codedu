@@ -2,10 +2,9 @@ import graphene
 
 from look.model import Base
 
-from look.gql import create_base_schema, create_auth_schema
+from look.gql import create_base_schema, create_auth_schema, create_post_schema
 
 def init_schema():
-    models = {}
     print("init_schema")
 
     query_field = {}
@@ -14,6 +13,7 @@ def init_schema():
     schemas = [
         create_base_schema,
         create_auth_schema,
+        create_post_schema,
     ]
 
     for schema in schemas:

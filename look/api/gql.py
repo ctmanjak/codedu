@@ -25,15 +25,6 @@ class Collection(object):
         return result
 
     @before(validate_token, is_async=True)
-    async def on_get(self, req, res):
-        result = await self.graphql_execute(req, res)
-        
-        if not result.errors:
-            res.status = HTTP_200
-            res.body = json.dumps(result.data)
-        else: raise HTTPBadRequest(description=result.errors[0].args[0])
-
-    
     async def on_post(self, req, res):
         result = await self.graphql_execute(req, res)
         

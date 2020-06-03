@@ -1,14 +1,17 @@
-# from sqlalchemy import Column
-# from sqlalchemy.orm import relationship
-# from sqlalchemy.dialects.mysql import INTEGER, VARCHAR, BIGINT
+from sqlalchemy import Column, ForeignKey
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy.dialects.mysql import INTEGER, VARCHAR, BIGINT
 
-# from look.model.base import Base
+from look.model.base import Base
 
-# class Board(Base):
-#     __tablename__ = 'board'
+class Post(Base):
+    __tablename__ = 'post'
 
-#     id = Column(BIGINT(unsigned=True), primary_key=True)
-#     content = Column(VARCHAR(32), nullable=False)
-#     subtitle = Column(VARCHAR(64), nullable=False)
+    id = Column(BIGINT(unsigned=True), primary_key=True)
+    content = Column(VARCHAR(1024), nullable=False)
+    image = Column(VARCHAR(128))
+    view = Column(INTEGER(unsigned=True), nullable=False, default=0)
+    like = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
-#     chapter = relationship('Chapter')
+    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id"), nullable=True)
+    user = relationship('User', backref=backref('posts', order_by=id, cascade="all, delete"), cascade="all, delete")

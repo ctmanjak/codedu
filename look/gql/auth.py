@@ -14,7 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from .util import create_gql_model, create_query_field, create_input_class, create_mutation_field
 
 def create_auth_schema():
-    def resolve_login(cls, info, model=None, **kwargs):
+    def login_mutate(cls, info, model=None, **kwargs):
         query = model.get_query(info)
         model = model._meta.model
         data = kwargs.get('data', {})
@@ -43,7 +43,7 @@ def create_auth_schema():
 
     query_field["login"] = create_mutation_field("Login",
         create_gql_model("login", User),
-        resolve_login,
+        login_mutate,
         create_input_class('LoginInput', {
             'username': graphene.String(),
             'password': graphene.String(),
@@ -52,15 +52,5 @@ def create_auth_schema():
             'token': graphene.String(),
         }
     )
-    # query_field["login"], query_field["resolve_login"] = create_query_field(
-    #     create_gql_model("login", User, {
-            
-    #     }),
-    #     resolve_login,
-    #     {
-    #         'username': graphene.String(),
-    #         'password': graphene.String(),
-    #     },
-    # )
 
     return (query_field, mutation_field)

@@ -18,6 +18,7 @@
 
 .pytest_cache/
 .venv/
+images/
 **/__pycache__
 todo.txt
 **/*.bak

@@ -1,5 +1,7 @@
 import graphene
 
+from sqlalchemy.orm.exc import NoResultFound
+
 from graphene_sqlalchemy import SQLAlchemyObjectType
 
 def create_gql_model(classname, model, fields={}, meta_fields={}):
@@ -41,3 +43,16 @@ def create_mutation_field(classname, model, mutate_func, input_class, fields={},
     fields["mutate"] = classmethod(lambda cls, _, info, model=model, **kwargs: mutate_func(cls, info, model, **kwargs))
     
     return type(classname, (graphene.Mutation,), fields).Field()
+
+def check_row_by_user_id(user_id, model, instance):
+    if model.__table__.fullname == 'user':
+        instance = instance.filter_by(id=user_id)
+    elif model.__table__.columns.get('user_id'):
+        instance = instance.filter_by(user_id=user_id)
+
+    try:
+        instance.one()
+    except NoResultFound:
+        return False
+
+    return True

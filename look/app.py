@@ -27,6 +27,17 @@ class RootPage(object):
     async def on_get(self, req, res):
         res.body = "codedu"
 
+    async def on_post(self, req, res):
+        media = await req.get_media()
+        for part in media:
+            if part.name == 'image':
+                if not os.path.isdir('images'): os.mkdir('images')
+                with open(f'images/{part.filename}', 'wb') as dest:
+                    part.stream.pipe(dest)
+
+        res.body = "hi"
+
+
 class TestPage(object):
     async def on_get(self, req, res):
         res.body = "HOSTNAME: " + os.environ.get('HOSTNAME', 'codedu')

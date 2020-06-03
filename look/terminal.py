@@ -100,7 +100,7 @@ class TerminalNamespace(socketio.AsyncNamespace):
             print("connect: child pid is", child_pid)
 
             self.sio.start_background_task(
-                target=self.read_and_forward_pty_output, sid=sid
+                target=self.read_output, sid=sid
             )
             
             print("connect: task started")
@@ -116,7 +116,7 @@ class TerminalNamespace(socketio.AsyncNamespace):
                 await self.sio.save_session(sid, session)
                         
     
-    async def read_and_forward_pty_output(self, sid):
+    async def read_output(self, sid):
         max_read_bytes = 1024 * 2
         
         while True:
