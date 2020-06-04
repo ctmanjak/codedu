@@ -29,3 +29,9 @@ deploy:
   script: bash docker-deploy.sh $TARGET_IP
   on:
     branch: master
+
+notifications:
+  email:
+  - ctmanjak@gmail.com
+  slack:
+    secure: L06LWIJkZk9v+m3ouCdhF5RbpJtWW/+AtxBKmlxzGo5SUn9XK59YHfb1srN3y/N9mU9cwBXJiCEUovZYWH8s8ArwBJnB7KjLWvTNOy1naGZivH09aMNgzfJQJ8Ujr4qSP3SvB7tdYX5VY0c7zvf1UvB05QyUJ37gdbglcudzdbBfNI3i3mQAyW2Yo1JWyWYPib0jDUzTLRJfGAc7MO1B1yG23yk2f/mHd4O/YyvW+nDKGktRvp2gK+PPh6FhjWfCIts28/ZRLRYnWZ/aoMQvv4NU0yrHPvG14UGStCe8SHjoy61stRwF0712Z1SgNq+ImpWBzm0EY7KAfuOe5krw+0UzUJS5+svAoUuYoeWCntBYz+8ia1VpQ6BUAlMVA7qIwdR382Tk4tO0RXYsSOXScOEMnHm52lkEl79r6jOR0mo9FlK9iRHmb8SE5f+hW5BvxwofgGq5yyErTf+Q1E3XT5gJeJ1uNg7iX2jGJGQiafaV6qVIKQ7pfyRjFyTLGCtPXtGRnK9PRuj6ODFxb1dKGW99Fu9MXSKtcPBJ+q0bmZZJo+Nheu6mfYBqAPsvPa5NqZeu8SetfsBR+j1ZyErz3/zQKcREXHhRu/9jtc9O9nSxc1RhFH3JcShcDbN51OJC6HaJ/yBO9Fs8ZjzE9ataGRd+VAD2lW+/oVDtnuozjeQ=
