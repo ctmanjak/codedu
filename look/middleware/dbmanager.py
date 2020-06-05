@@ -26,6 +26,7 @@ class DBManager:
                     raise HTTPBadRequest(description="INTEGRITY ERROR")
                 except OperationalError:
                     db_session.rollback()
+                    print_exc()
                     raise HTTPBadRequest(description="OPERATIONAL ERROR")
                 except:
                     db_session.rollback()

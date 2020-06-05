@@ -4,7 +4,7 @@ from urllib.parse import parse_qs
 
 from look.hook.authmanager import validate_token
 
-from falcon import HTTP_200, before, HTTPBadRequest
+from falcon import HTTP_200, before, HTTPBadRequest, HTTPUnauthorized
 
 class Collection(object):
     def __init__(self, search=False):
@@ -20,7 +20,7 @@ class Collection(object):
         variables = data.get('variables', None)
         operation_name = data.get('operation_name', None)
 
-        result = schema.execute(query, variables=variables, operation_name=operation_name, context_value={'session': db_session, 'auth': auth, 'search': self.search})
+        result = schema.execute(query, variable_values=variables, operation_name=operation_name, context_value={'session': db_session, 'auth': auth, 'search': self.search})
         
         return result
 
@@ -31,4 +31,10 @@ class Collection(object):
         if not result.errors:
             res.status = HTTP_200
             res.body = json.dumps(result.data)
-        else: raise HTTPBadRequest(description=result.errors[0].args[0])
+        else:
+            # error = json.loads(result.errors[0].message)
+            # if error['status'] == 401:
+            #     raise HTTPUnauthorized(description=error)
+            # else:
+            #     raise HTTPBadRequest(description=error)
+            raise HTTPBadRequest(description=result.errors[0].message)

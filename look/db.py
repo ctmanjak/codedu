@@ -13,6 +13,9 @@ from sqlalchemy.exc import OperationalError
 from look.config import Config
 from look.model import Base
 
+def create_db(engine):
+    Base.metadata.create_all(bind=engine)
+
 def init_db():
     print("init_db")
     
@@ -25,7 +28,7 @@ def init_db():
             
             db_session = sessionmaker(bind=engine)
 
-            Base.metadata.create_all(bind=engine)
+            create_db(engine)
         except OperationalError as e:
             pass
         except:
@@ -56,6 +59,9 @@ def truncate_table(db_session, engine, tablename=None):
     except:
         traceback.print_exc()
         db_session.rollback()
+
+def drop_db(engine):
+        Base.metadata.drop_all(bind=engine)
 
 def get_class_by_tablename(tablename):
     for c in Base._decl_class_registry.values():
@@ -120,6 +126,53 @@ def insert_dummy_data(db_session):
                 'subtitle':'Board2\'s subtitle',
             },
         ],
+        'post' : [
+            {
+                'content':'post 1',
+                'user_id':1,
+            },
+            {
+                'content':'post 2',
+                'user_id':1,
+            },
+        ],
+        'post_comment' : [
+            {
+                'post_id':1,
+                'content':'comment 1',
+                'user_id':1,
+                
+            },
+            {
+                'post_id':1,
+                'content':'comment 1-1',
+                'user_id':1,
+                'parent_comment_id':1,
+            },
+            {
+                'post_id':1,
+                'content':'comment 1-2',
+                'user_id':2,
+                'parent_comment_id':1,
+            },
+            {
+                'post_id':1,
+                'content':'comment 2',
+                'user_id':2,
+            },
+            {
+                'post_id':1,
+                'content':'comment 2-1',
+                'user_id':1,
+                'parent_comment_id':4,
+            },
+            {
+                'post_id':1,
+                'content':'comment 2-2',
+                'user_id':3,
+                'parent_comment_id':4,
+            },
+        ],
         'chapter' : [{'title':f'Chapter{i+1}'} for i in range(4)],
         'subchapter' : [{'title':f'Subchapter{i+1}'} for i in range(8)],
     }
@@ -138,7 +191,7 @@ def insert_dummy_data(db_session):
         },
         "category" : {
             "target" : "board",
-            "rel_name" : "board",
+            "rel_name" : "boards",
             "data" : [
                 [1, 1],
                 [1, 2],

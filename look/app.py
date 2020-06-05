@@ -1,7 +1,7 @@
 import os
 import falcon.asgi
 
-from look.db import init_db, insert_dummy_data, truncate_table
+from look.db import init_db, insert_dummy_data, truncate_table, drop_db, create_db
 from look.terminal import TerminalNamespace, init_socket
 from look.api import auth, db, gql
 from look.middleware.jsontranslator import JSONTranslator
@@ -43,16 +43,25 @@ class TestPage(object):
         res.body = "HOSTNAME: " + os.environ.get('HOSTNAME', 'codedu')
 
 class DBControl(object):
-    async def on_post(self, req, res, table):
+    async def on_get(self, req, res):
+        create_db(engine)
+
+    async def on_post(self, req, res):
         insert_dummy_data(db_session())
 
-    async def on_delete(self, req, res, table):
-        truncate_table(db_session(), engine, table)
+    async def on_delete(self, req, res):
+        # truncate_table(db_session(), engine, table)
+        drop_db(engine)
+
+    async def on_put(self, req, res):
+        await self.on_delete(req, res)
+        await self.on_get(req, res)
+        await self.on_post(req, res)
 
 app.add_route('/', RootPage())
 app.add_route('/test', TestPage())
 
-app.add_route('/test/db/{table}', DBControl())
+app.add_route('/test/db', DBControl())
 
 app.add_route('/api/auth/check', auth.Check())
 app.add_route('/api/auth/register', auth.Register())

@@ -1,17 +1,7 @@
-import jwt
 import graphene
-import datetime
-import hmac
-from hashlib import sha256
 
-from look.config import Config
-from look.model import Post
-
-from falcon import HTTPBadRequest
-
-from sqlalchemy.orm.exc import NoResultFound
-
-from .util import create_gql_model, create_query_field, create_input_class, create_mutation_field
+from . import gql_models
+from .util import create_input_class, create_mutation_field, get_instance_by_pk, check_row_by_user_id
 
 def create_post_schema():
     def create_post(cls, info, model=None, **kwargs):
@@ -29,15 +19,67 @@ def create_post_schema():
         else:
             raise Exception(info.context['auth']['description'])
 
+    def update_post_mutate(cls, info, model=None, **kwargs):
+        if info.context['auth']['data']:
+            query = model.get_query(info)
+            model = model._meta.model
+            data = kwargs.get('data', None)
+            if data:
+                instance = get_instance_by_pk(query, model, data)
+                
+                if info.context['auth']['data']['admin'] or check_row_by_user_id(info.context['auth']['data']['user_id'], model, instance):
+                    instance.update(data)
+                    return cls(**{model.__tablename__:instance.one()})
+                else:
+                    raise Exception("PERMISSION DENIED")
+        else:
+            raise Exception(info.context['auth']['description'])
+
+    def delete_post_mutate(cls, info, model=None, **kwargs):
+        if info.context['auth']['data']:
+            query = model.get_query(info)
+            model = model._meta.model
+            data = kwargs.get('data', None)
+            if data:
+                instance = get_instance_by_pk(query, model, data)
+                
+                if info.context['auth']['data']['admin'] or check_row_by_user_id(info.context['auth']['data']['user_id'], model, instance):
+                    tmp_instance = instance.one()
+                    instance.delete()
+                    return cls(**{model.__tablename__:tmp_instance})
+                else:
+                    raise Exception("PERMISSION DENIED")
+        else:
+            raise Exception(info.context['auth']['description'])
+
     query_field = {}
     mutation_field = {}
 
     mutation_field["create_post"] = create_mutation_field("CreatePost",
-        create_gql_model("createpost", Post),
+        gql_models['post'],
         create_post,
-        create_input_class('createpostInput', {
-            'content': graphene.String(),
+        create_input_class('CreatePostInput', {
+            'content': graphene.String(required=True),
+            'image': graphene.String(),
         })
+    )
+
+    mutation_field["update_post"] = create_mutation_field("UpdatePost",
+        gql_models['post'],
+        update_post_mutate,
+        create_input_class('UpdatePostInput', {
+            "id": graphene.ID(required=True),
+            "content": graphene.String(required=True),
+            "image": graphene.String(),
+        }),
+    )
+
+    mutation_field["delete_post"] = create_mutation_field("DeletePost",
+        gql_models['post'],
+        delete_post_mutate,
+        create_input_class('DeletePostInput', {
+            "id": graphene.ID(required=True)
+        }),
     )
 
     return (query_field, mutation_field)

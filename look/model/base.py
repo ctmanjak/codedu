@@ -2,15 +2,16 @@ import json
 import datetime
 import collections
 
-from sqlalchemy import Column, DateTime, func
+from sqlalchemy import Column
 from sqlalchemy.ext.declarative import declarative_base, as_declarative
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
 from sqlalchemy.orm.collections import InstrumentedList
+from sqlalchemy.dialects.mysql import DATETIME
 
 @as_declarative()
 class BaseModel(object):
-    created = Column(DateTime, nullable=False, default=func.now())
-    modified = Column(DateTime, nullable=False, default=func.now(), onupdate=func.now())
+    created = Column(DATETIME, nullable=False, default=datetime.datetime.utcnow())
+    modified = Column(DATETIME, nullable=False, default=datetime.datetime.utcnow(), onupdate=datetime.datetime.utcnow)
 
     def __init(self, **kwargs):
         for arg in kwargs:

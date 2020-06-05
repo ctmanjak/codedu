@@ -15,5 +15,5 @@ __all__ = [
     "Subchapter",
     "User",
     "Post",
-    "PostComment"
+    "PostComment",
 ]

@@ -4,7 +4,7 @@ from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 
 from look.config import Config
 
-from falcon import HTTP_403, HTTPUnauthorized
+from falcon import HTTPUnauthorized
 
 async def validate_token(req, res, resource, params):
     tmp_auth = {
