@@ -438,7 +438,7 @@ def test_update_password_by_admin(client):
     body = {
         "query": '''
             mutation {
-                updatePassword(data: {id: 8, password:"updateduser123!", newPassword:"updatedbyadmin123!"}) {
+                updatePassword(data: {id: 8, newPassword:"updatedbyadmin123!"}) {
                     user {
                         email
                         username

@@ -80,9 +80,10 @@ def create_auth_schema():
             model = model._meta.model
             data = kwargs.get('data', None)
             if data:
-                if not info.context['auth']['data']['admin']: data['id'] = info.context['auth']['data']['user_id']
+                if not info.context['auth']['data']['admin']:
+                    data['id'] = info.context['auth']['data']['user_id']
+                    data['password'] = hmac.new(Config.SECRET_KEY.encode(), data['password'].encode(), sha256).hexdigest()
                 data["password_modified"] = datetime.datetime.utcnow()
-                data['password'] = hmac.new(Config.SECRET_KEY.encode(), data['password'].encode(), sha256).hexdigest()
                 
                 instance = get_instance_by_pk(query, model, data)
 

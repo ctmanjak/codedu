@@ -22,8 +22,6 @@ def init_schema():
         query_field.update(tmp_query_field)
         mutation_field.update(tmp_mutation_field)
 
-    # mutation_field["register"] = mutation_field["create_user"]
-
     Query = type("Query", (graphene.ObjectType,), query_field)
     Mutation = type("Mutation", (graphene.ObjectType,), mutation_field)
     return {'query': Query, 'mutation': Mutation}
