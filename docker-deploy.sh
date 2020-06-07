@@ -63,7 +63,7 @@ if [[ -f cert/ca.pem && -f cert/cert.pem && -f cert/key.pem ]]; then
 
             if [ ! "${PREV_NGINX_CONF}" = "${CURRENT_NGINX_CONF}" ]; then
                 if ! docker config ls | grep -wq "${CURRENT_NGINX_CONF}"; then
-                    docker config create "${CURRENT_NGINX_CONF}" ./config/nginx_default.cnf
+                    docker config create "${CURRENT_NGINX_CONF}" ./config/nginx_default.conf
                 fi
                 docker service update \
                     --config-add "${CURRENT_NGINX_CONF}" \
