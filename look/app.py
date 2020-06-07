@@ -1,18 +1,30 @@
 import os
+import falcon
 import falcon.asgi
 
 from look.db import init_db, insert_dummy_data, truncate_table, drop_db, create_db
 from look.terminal import TerminalNamespace, init_socket
 from look.api import auth, db, gql
-from look.middleware.jsontranslator import JSONTranslator
+from look.middleware.requestdatamanager import RequetDataManager
 from look.middleware.dbmanager import DBManager
 from look.middleware.socketmanager import SocketManager
 from look.schema import schema
 
+from falcon import media
+from falcon.media import MultipartFormHandler
+from falcon.media.multipart import MultipartParseOptions
+
 db_session, engine = init_db()
 
+parse_options = MultipartParseOptions()
+parse_options.max_body_part_buffer_size = 3 * 1024 * 1024
+handlers = media.Handlers({
+    'multipart/form-data': MultipartFormHandler(parse_options=parse_options),
+})
+
+
 middleware = [
-    JSONTranslator(),
+    RequetDataManager(),
     DBManager(db_session, schema),
 ]
 
@@ -22,6 +34,8 @@ sio.register_namespace(TerminalNamespace('/', sio))
 app.add_middleware(SocketManager(sio))
 
 app.req_options.strip_url_path_trailing_slash = True
+app.req_options.media_handlers.update(handlers)
+app.resp_options.media_handlers.update(handlers)
 
 class RootPage(object):
     async def on_get(self, req, res):
@@ -29,11 +43,12 @@ class RootPage(object):
 
     async def on_post(self, req, res):
         media = await req.get_media()
-        for part in media:
-            if part.name == 'image':
-                if not os.path.isdir('images'): os.mkdir('images')
-                with open(f'images/{part.filename}', 'wb') as dest:
-                    part.stream.pipe(dest)
+        if media:
+            for part in media:
+                if part.name == 'image':
+                    if not os.path.isdir('images'): os.mkdir('images')
+                    with open(f'images/{part.filename}', 'wb') as dest:
+                        part.stream.pipe(dest)
 
         res.body = "hi"
 
@@ -70,5 +85,4 @@ app.add_route('/api/auth/login', auth.Login())
 app.add_route('/api/db/{table}', db.Collection())
 app.add_route('/api/db/{table}/{id}', db.Item())
 
-app.add_route('/api/graphql', gql.Collection(search=False))
-app.add_route('/api/graphql/search', gql.Collection(search=True))
+app.add_route('/api/graphql', gql.Collection())

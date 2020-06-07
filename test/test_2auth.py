@@ -4,6 +4,7 @@ import falcon
 import hmac
 from hashlib import sha256
 from cerberus import Validator
+from requests_toolbelt import MultipartEncoder
 
 from look.app import app
 from look.config import Config
@@ -489,3 +490,113 @@ def test_delete_account_by_admin(client):
 
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
+
+def test_register_with_not_allowed_image(client):
+    doc = {
+        "title": "400 Bad Request",
+        "description": "Not allowed image type"
+    }
+
+    query = {
+        "query": '''
+            mutation {
+                register(data: {username:"imagetestuser", email:"imagetestuser@email.com", password:"imagetestuser123!"}) {
+                    user {
+                        email
+                        username
+                        password
+                    }
+                }
+            }
+        '''
+    }
+    fake_image_byte = b"a" * (2 * 1024 * 1024)
+    
+    m = MultipartEncoder(
+    fields={'data': ('data', json.dumps(query), 'application/json'),
+            'image': ('a.gif', fake_image_byte, 'image/gif')}
+    )
+    
+    response = client.simulate_post('/api/graphql', content_type=m.content_type, body=m.to_string())
+
+    result_doc = json.loads(response.content.decode())
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_400
+
+def test_register_with_larger_than_2mb_image(client):
+    doc = {
+        "title": "400 Bad Request",
+        "description": "Max file size is 2MB"
+    }
+
+    query = {
+        "query": '''
+            mutation {
+                register(data: {username:"imagetestuser", email:"imagetestuser@email.com", password:"imagetestuser123!"}) {
+                    user {
+                        email
+                        username
+                        password
+                    }
+                }
+            }
+        '''
+    }
+    fake_image_byte = b"a" * (2 * 1024 * 1024 + 1)
+    
+    m = MultipartEncoder(
+    fields={'data': ('data', json.dumps(query), 'application/json'),
+            'image': ('a.png', fake_image_byte, 'image/png')}
+    )
+    
+    response = client.simulate_post('/api/graphql', content_type=m.content_type, body=m.to_string())
+
+    result_doc = json.loads(response.content.decode())
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_400
+
+def test_register_with_valid_image(client):
+    doc = {
+        "register": {
+            "user": {
+                "email": "imagetestuser@email.com",
+                "username": "imagetestuser",
+                "password": hmac.new(Config.SECRET_KEY.encode(), "imagetestuser123!".encode(), sha256).hexdigest(),
+                "image": "test/images/user/0000000009.png"
+            }
+        }
+    }
+
+    query = {
+        "query": '''
+            mutation {
+                register(data: {username:"imagetestuser", email:"imagetestuser@email.com", password:"imagetestuser123!"}) {
+                    user {
+                        email
+                        username
+                        password
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    fake_image_byte = b"a" * (2 * 1024 * 1024)
+    
+    m = MultipartEncoder(
+    fields={'data': ('data', json.dumps(query), 'application/json'),
+            'image': ('a.png', fake_image_byte, 'image/png')}
+    )
+    
+    response = client.simulate_post('/api/graphql', content_type=m.content_type, body=m.to_string())
+
+    result_doc = json.loads(response.content.decode())
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_OK
+
+    with open(doc['register']['user']['image'], 'rb') as f:
+        assert f.read() == fake_image_byte
+

@@ -1,9 +1,22 @@
+import os
+import sys
+import graphene
+
+from traceback import print_exc
+
+from falcon import HTTPBadRequest, HTTPInternalServerError
+
+from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.orm.exc import NoResultFound
 
-import graphene
+from graphql import GraphQLError
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType
 from graphene_sqlalchemy_filter import FilterableConnectionField, FilterSet
+
+if "pytest" in sys.modules:
+    image_path = 'test/images/'
+else: image_path = 'images/'
 
 def create_gql_model_class(classname, db_model, fields={}, meta_fields={}):
     tablename = db_model.__table__.fullname
@@ -13,6 +26,7 @@ def create_gql_model_class(classname, db_model, fields={}, meta_fields={}):
 
 def get_instance_by_pk(query, db_model, data):
     primary_keys = [a for a in db_model.__table__.primary_key]
+    instance = None
 
     find_pks = {}
     for pk in primary_keys:
@@ -85,3 +99,30 @@ def create_node_class(classname, db_model, connection_field_factory):
             "connection_field_factory": connection_field_factory,
         }),
     })
+
+def db_session_flush(db_session):
+    try:
+        db_session.flush()
+    except IntegrityError:
+        db_session.rollback()
+        raise Exception("INTEGRITY ERROR")
+    except OperationalError:
+        db_session.rollback()
+        print_exc()
+        raise Exception("OPERATIONAL ERROR")
+    except:
+        db_session.rollback()
+        print_exc()
+        raise Exception("UNKNOWN ERROR")
+
+def image_handle(tablename, image_info, instance):
+    if not os.path.isdir(f'{image_path}'): os.mkdir(f'{image_path}')
+    if not os.path.isdir(f'{image_path}{tablename}'): os.mkdir(f'{image_path}{tablename}')
+    for ext in ['.jpg', '.png']:
+        if os.path.exists(f"./{image_path}{tablename}/{instance.id:010}{ext}"):
+            os.remove(f"./{image_path}{tablename}/{instance.id:010}{ext}")
+    os.rename(f"./{image_info['dir']}{image_info['name']}{image_info['ext']}", f"./{image_path}{tablename}/{instance.id:010}{image_info['ext']}")
+    image_info['dir'] = f'{image_path}{tablename}/'
+    image_info['name'] = f"{instance.id:010}"
+
+    instance.image = f"{image_info['dir']}{image_info['name']}{image_info['ext']}"

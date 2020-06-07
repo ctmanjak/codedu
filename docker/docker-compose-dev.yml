@@ -44,6 +44,7 @@ services:
     image: nginx
     volumes:
       - ../config/nginx_default.conf:/etc/nginx/conf.d/default.conf
+      - ../images/:/codedu/images/
     ports:
       - "8000:80"
     depends_on:

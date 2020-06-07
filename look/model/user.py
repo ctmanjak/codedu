@@ -16,7 +16,7 @@ class User(Base):
     password_modified = Column(DATETIME, nullable=False, default=datetime.datetime.utcnow())
     admin = Column(BOOLEAN, nullable=False, default=False)
     exp = Column(INTEGER(unsigned=True), nullable=False, default=0)
-    user_img = Column(VARCHAR(128))
+    image = Column(VARCHAR(128))
 
     learning_progress = relationship("Subchapter", backref="users", secondary="learning_progress", cascade="all, delete")
 

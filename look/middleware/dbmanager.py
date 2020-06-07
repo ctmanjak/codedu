@@ -9,15 +9,15 @@ class DBManager:
         self.db_session = db_session
         self.schema = schema
 
-    async def process_resource(self, req, resp, resource, params):
+    async def process_resource(self, req, res, resource, params):
         req.context['db_session'] = self.db_session()
         req.context['schema'] = self.schema
         
-    async def process_response(self, req, resp, resource, req_succeeded):
+    async def process_response(self, req, res, resource, req_succeeded):
         db_session = req.context.get('db_session', None)
         if db_session:
             if not req_succeeded:
-                req.context['db_session'].rollback()
+                db_session.rollback()
             else:
                 try:
                     db_session.commit()
@@ -32,5 +32,12 @@ class DBManager:
                     db_session.rollback()
                     print_exc()
                     raise HTTPInternalServerError(description="UNKNOWN ERROR")
+                else:
+                    pass
+                    # image_info = req.context.get('image_info', None)
+                    # image_info['name'] = f"{instance.id:010}"
+                    # with open(f"images/{image_info['dir']}{image_info['name']}{image_info['ext']}", 'wb') as f:
+                    #     f.write(image_info['data'])
+                    # instance.user_img = f"{image_info['dir']}{image_info['name']}{image_info['ext']}"
 
-            req.context['db_session'].close()
+            db_session.close()

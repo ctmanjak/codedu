@@ -11,7 +11,7 @@ from look.config import Config
 
 from . import gql_models
 from .util import create_input_class, create_mutation_field, get_instance_by_pk, check_row_by_user_id, \
-    create_filter_class, create_connection_class, create_node_class
+    create_filter_class, create_connection_class, create_node_class, db_session_flush
 
 def create_base_schema():
     def resolve_model(self, info, model, **kwargs):
@@ -41,6 +41,7 @@ def create_base_schema():
             if db_session:
                 instance = model(**data)
                 db_session.add(instance)
+                db_session_flush(db_session)
 
             return cls(**{model.__tablename__:instance})
 
