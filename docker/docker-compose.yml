@@ -70,11 +70,3 @@ services:
           - "node.role==manager"
     depends_on:
       - falcon
-
-configs:
-  mariadb_conf:
-    name: mariadb_conf-${MARIADB_CONF_VER}
-    file: ../config/mariadb_default.cnf
-  nginx_conf:
-    name: nginx_conf-${NGINX_CONF_VER}
-    file: ../config/nginx_default.conf
