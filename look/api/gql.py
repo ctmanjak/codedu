@@ -28,6 +28,7 @@ class Collection(object):
     async def on_post(self, req, res):
         result = await self.graphql_execute(req, res)
         image_info = req.context.get('image_info', None)
+        
         if not result.errors:
             res.status = HTTP_200
             res.body = json.dumps(result.data)
@@ -41,7 +42,7 @@ class Collection(object):
             #     raise HTTPUnauthorized(description=error)
             # else:
             #     raise HTTPBadRequest(description=error)
-            
+            print(result.errors[0].message if hasattr(result.errors[0], 'message') else result.errors[0].args[0])
             raise HTTPBadRequest(description=result.errors[0].message if hasattr(result.errors[0], 'message') else result.errors[0].args[0])
             # res.status = falcon.HTTP_400
             
