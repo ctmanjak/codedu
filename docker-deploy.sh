@@ -53,7 +53,7 @@ if [[ -f cert/ca.pem && -f cert/cert.pem && -f cert/key.pem ]]; then
                     docker config create "${CURRENT_MARIADB_CONF}" ./config/mariadb_default.cnf
                 fi
                 docker service update \
-                    --config-add "${CURRENT_MARIADB_CONF}" \
+                    --config-add source="${CURRENT_MARIADB_CONF}",target=/etc/mysql/mariadb.conf.d/default.cnf \
                     --config-rm "${PREV_MARIADB_CONF}" \
                     codedu_mariadb --force
             fi
@@ -66,7 +66,7 @@ if [[ -f cert/ca.pem && -f cert/cert.pem && -f cert/key.pem ]]; then
                     docker config create "${CURRENT_NGINX_CONF}" ./config/nginx_default.conf
                 fi
                 docker service update \
-                    --config-add "${CURRENT_NGINX_CONF}" \
+                    --config-add source="${CURRENT_NGINX_CONF}",target=/etc/nginx/conf.d/default.conf \
                     --config-rm "${PREV_NGINX_CONF}" \
                     codedu_nginx --force
             fi
