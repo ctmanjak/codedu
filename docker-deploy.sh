@@ -48,7 +48,7 @@ if [[ -f cert/ca.pem && -f cert/cert.pem && -f cert/key.pem ]]; then
             CURRENT_MARIADB_CONF="mariadb_conf-${MARIADB_CONF_VER}"
             CURRENT_NGINX_CONF="nginx_conf-${NGINX_CONF_VER}"
 
-            if [ ! "${PREV_MARIADB_CONF}" = "${CURRENT_MARIADB_CONF}" ]; then
+            if [[ ! "${PREV_MARIADB_CONF}" || ! "${PREV_MARIADB_CONF}" = "${CURRENT_MARIADB_CONF}" ]]; then
                 if ! docker config ls | grep -wq "${CURRENT_MARIADB_CONF}"; then
                     docker config create "${CURRENT_MARIADB_CONF}" ./config/mariadb_default.cnf
                 fi
@@ -61,7 +61,7 @@ if [[ -f cert/ca.pem && -f cert/cert.pem && -f cert/key.pem ]]; then
             docker pull ctmanjak/codedu_falcon
             docker service update codedu_falcon --force --image ctmanjak/codedu_falcon
 
-            if [ ! "${PREV_NGINX_CONF}" = "${CURRENT_NGINX_CONF}" ]; then
+            if [[ ! "${PREV_NGINX_CONF}" || ! "${PREV_NGINX_CONF}" = "${CURRENT_NGINX_CONF}" ]]; then
                 if ! docker config ls | grep -wq "${CURRENT_NGINX_CONF}"; then
                     docker config create "${CURRENT_NGINX_CONF}" ./config/nginx_default.conf
                 fi
