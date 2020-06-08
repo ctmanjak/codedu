@@ -57,7 +57,7 @@ def truncate_table(db_session, engine, tablename=None):
     try:
         db_session.commit()
     except:
-        traceback.print_exc()
+        print_exc()
         db_session.rollback()
 
 def drop_db(engine):

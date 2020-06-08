@@ -2,6 +2,7 @@ import os
 import json
 import falcon
 import graphene
+from traceback import print_exc
 from urllib.parse import parse_qs
 
 from look.hook.authmanager import validate_token
@@ -46,4 +47,5 @@ class Collection(object):
             if hasattr(e, 'type'):
                 raise globals()[e.type](description=description)
             else:
+                print_exc()
                 raise HTTPBadRequest(description=e.args)
