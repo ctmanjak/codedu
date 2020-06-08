@@ -91,7 +91,7 @@ class TerminalNamespace(socketio.AsyncNamespace):
         (child_pid, fd) = pty.fork()
 
         if child_pid == 0:
-            subprocess.run(["docker", "run", "-it", "--rm", "--name", sid, "codedu"])
+            subprocess.run(["docker", "run", "-it", "--rm", "--name", sid, "ctmanjak/codedu_base"])
         else:
             print("opening a new session")
 
