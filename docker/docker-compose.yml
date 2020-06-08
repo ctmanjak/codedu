@@ -1,7 +1,11 @@
 version: '3.7'
 volumes:
-  codedu_db: {}
-  codedu_image: {}
+  codedu_db:
+  codedu_image:
+    driver_opts:
+      type: "nfs"
+      o: "addr=15.165.181.246"
+      device: ":/opt/dockers"
   
 services:
   mariadb:
