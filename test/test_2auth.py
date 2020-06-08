@@ -843,7 +843,7 @@ def test_register_with_invalid_username_1(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_400
 
-def test_register_with_invalid_username_1(client):
+def test_register_with_invalid_username_2(client):
     doc = {
         "title": "400 Bad Request",
         "description": "Username can only contain alphanumeric characters and underscore.",

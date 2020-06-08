@@ -86,7 +86,7 @@ def create_connection_class(classname, model):
     
 def create_filter_class(classname, db_model):
     fields = {key:[...] for key in db_model.__table__.columns.keys()}
-
+    
     return type(classname, (FilterSet,), {
         "Meta": type("Meta", (), {
             "model": db_model,
@@ -97,7 +97,7 @@ def create_filter_class(classname, db_model):
 def create_node_class(classname, db_model, connection_field_factory):
     return type(classname, (SQLAlchemyObjectType,), {
         "Meta": type("Meta", (), {
-            "model": db_model._meta.model,
+            "model": db_model,
             "interfaces": (graphene.Node,),
             "connection_field_factory": connection_field_factory,
         }),

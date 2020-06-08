@@ -12,7 +12,7 @@ from . import client, my_token, others_token, admin_token
 
 v = Validator()
 
-def test_create_post_without_token(client):
+def test_create_post_comment_without_token(client):
     doc = {
         "title": "401 Unauthorized",
         "description": "토큰이 없는뎁쇼",
@@ -21,8 +21,8 @@ def test_create_post_without_token(client):
     body = {
         "query": '''
             mutation {
-                createPost(data: {content:"pytest_post-1"}) {
-                    post {
+                createPostComment(data: {postId: 1, content:"pytest_post_comment_comment-1"}) {
+                    postComment {
                         content
                     }
                 }
@@ -36,21 +36,21 @@ def test_create_post_without_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_401
 
-def test_create_post_with_token(client):
+def test_create_post_comment_with_token(client):
     doc = {
-        "CreatePost": {
-            "post": {
-                "content": "pytest_post-1",
+        "CreatePostComment": {
+            "postComment": {
+                "content": "pytest_post_comment-1",
             }
         },
-        "CreatePost2": {
-            "post": {
-                "content": "pytest_post-2",
+        "CreatePostComment2": {
+            "postComment": {
+                "content": "pytest_post_comment-2",
             }
         },
-        "CreatePost3": {
-            "post": {
-                "content": "pytest_post-3",
+        "CreatePostComment3": {
+            "postComment": {
+                "content": "pytest_post_comment-3",
             }
         },
     }
@@ -58,18 +58,18 @@ def test_create_post_with_token(client):
     body = {
         "query": '''
             mutation {
-                CreatePost: createPost(data: {content:"pytest_post-1"}) {
-                    post {
+                CreatePostComment: createPostComment(data: {postId: 1, content:"pytest_post_comment-1"}) {
+                    postComment {
                         content
                     }
                 }
-                CreatePost2: createPost(data: {content:"pytest_post-2"}) {
-                    post {
+                CreatePostComment2: createPostComment(data: {postId: 1, content:"pytest_post_comment-2"}) {
+                    postComment {
                         content
                     }
                 }
-                CreatePost3: createPost(data: {content:"pytest_post-3"}) {
-                    post {
+                CreatePostComment3: createPostComment(data: {postId: 1, content:"pytest_post_comment-3"}) {
+                    postComment {
                         content
                     }
                 }
@@ -85,7 +85,7 @@ def test_create_post_with_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-def test_update_post_without_token(client):
+def test_update_post_comment_comment_without_token(client):
     doc = {
         "title": "401 Unauthorized",
         "description": "토큰이 없는뎁쇼",
@@ -94,8 +94,8 @@ def test_update_post_without_token(client):
     body = {
         "query": '''
             mutation {
-                updatePost(data: {id: 5, content:"pytest_updatedpost-1"}) {
-                    post {
+                updatePostComment(data: {id: 9, content:"pytest_updatedpost_comment-1"}) {
+                    postComment {
                         content
                     }
                 }
@@ -109,7 +109,7 @@ def test_update_post_without_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_401
 
-def test_update_post_with_invalid_token(client):
+def test_update_post_comment_with_invalid_token(client):
     doc = {
         "title": "401 Unauthorized",
         "description": "PERMISSION DENIED",
@@ -118,8 +118,8 @@ def test_update_post_with_invalid_token(client):
     body = {
         "query": '''
             mutation {
-                updatePost(data: {id: 5, content:"pytest_updatedpost-1"}) {
-                    post {
+                updatePostComment(data: {id: 9, content:"pytest_updatedpost_comment-1"}) {
+                    postComment {
                         content
                     }
                 }
@@ -135,11 +135,11 @@ def test_update_post_with_invalid_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_401
 
-def test_update_post_with_valid_token(client):
+def test_update_post_comment_with_valid_token(client):
     doc = {
-        "updatePost": {
-            "post": {
-                "content": "pytest_updatedpost-1"
+        "updatePostComment": {
+            "postComment": {
+                "content": "pytest_updatedpost_comment-1"
             }
         }
     }
@@ -147,8 +147,8 @@ def test_update_post_with_valid_token(client):
     body = {
         "query": '''
             mutation {
-                updatePost(data: {id: 5, content:"pytest_updatedpost-1"}) {
-                    post {
+                updatePostComment(data: {id: 9, content:"pytest_updatedpost_comment-1"}) {
+                    postComment {
                         content
                     }
                 }
@@ -164,7 +164,7 @@ def test_update_post_with_valid_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-def test_delete_post_without_token(client):
+def test_delete_post_comment_without_token(client):
     doc = {
         "title": "401 Unauthorized",
         "description": "토큰이 없는뎁쇼",
@@ -173,8 +173,8 @@ def test_delete_post_without_token(client):
     body = {
         "query": '''
             mutation {
-                deletePost(data: {id: 5}) {
-                    post {
+                deletePostComment(data: {id: 9}) {
+                    postComment {
                         content
                     }
                 }
@@ -188,7 +188,7 @@ def test_delete_post_without_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_401
 
-def test_delete_post_with_invalid_token(client):
+def test_delete_post_comment_with_invalid_token(client):
     doc = {
         "title": "401 Unauthorized",
         "description": "PERMISSION DENIED",
@@ -197,8 +197,8 @@ def test_delete_post_with_invalid_token(client):
     body = {
         "query": '''
             mutation {
-                deletePost(data: {id: 5}) {
-                    post {
+                deletePostComment(data: {id: 9}) {
+                    postComment {
                         content
                     }
                 }
@@ -214,11 +214,11 @@ def test_delete_post_with_invalid_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_401
 
-def test_delete_post_with_valid_token(client):
+def test_delete_post_comment_with_valid_token(client):
     doc = {
-        "deletePost": {
-            "post": {
-                "content": "pytest_updatedpost-1"
+        "deletePostComment": {
+            "postComment": {
+                "content": "pytest_updatedpost_comment-1"
             }
         }
     }
@@ -226,8 +226,8 @@ def test_delete_post_with_valid_token(client):
     body = {
         "query": '''
             mutation {
-                deletePost(data: {id: 5}) {
-                    post {
+                deletePostComment(data: {id: 9}) {
+                    postComment {
                         content
                     }
                 }
@@ -243,10 +243,10 @@ def test_delete_post_with_valid_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-def test_update_post_by_admin(client):
+def test_update_post_comment_by_admin(client):
     doc = {
-        "updatePost": {
-            "post": {
+        "updatePostComment": {
+            "postComment": {
                 "content": "pytest_updatedbyadmin-1"
             }
         }
@@ -255,8 +255,8 @@ def test_update_post_by_admin(client):
     body = {
         "query": '''
             mutation {
-                updatePost(data: {id: 4, content:"pytest_updatedbyadmin-1"}) {
-                    post {
+                updatePostComment(data: {id: 8, content:"pytest_updatedbyadmin-1"}) {
+                    postComment {
                         content
                     }
                 }
@@ -272,10 +272,10 @@ def test_update_post_by_admin(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-def test_delete_post_by_admin(client):
+def test_delete_post_comment_by_admin(client):
     doc = {
-        "deletePost": {
-            "post": {
+        "deletePostComment": {
+            "postComment": {
                 "content": "pytest_updatedbyadmin-1"
             }
         }
@@ -284,8 +284,8 @@ def test_delete_post_by_admin(client):
     body = {
         "query": '''
             mutation {
-                deletePost(data: {id: 4}) {
-                    post {
+                deletePostComment(data: {id: 8}) {
+                    postComment {
                         content
                     }
                 }
@@ -300,112 +300,4 @@ def test_delete_post_by_admin(client):
 
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
-
-def test_create_post_with_not_allowed_image(client):
-    doc = {
-        "title": "400 Bad Request",
-        "description": "Not allowed image type"
-    }
-
-    query = {
-        "query": '''
-            mutation {
-                createPost(data: {content:"imagetest_post-1"}) {
-                    post {
-                        content
-                        image
-                    }
-                }
-            }
-        '''
-    }
-    fake_image_byte = b"a" * (2 * 1024 * 1024)
-    
-    m = MultipartEncoder(
-    fields={'data': ('data', json.dumps(query), 'application/json'),
-            'image': ('a.gif', fake_image_byte, 'image/gif')}
-    )
-    
-    response = client.simulate_post('/api/graphql', content_type=m.content_type, body=m.to_string(), headers={
-        "Authorization": my_token,
-    })
-
-    result_doc = json.loads(response.content.decode())
-
-    assert result_doc == doc
-    assert response.status == falcon.HTTP_400
-
-def test_create_post_with_larger_than_2mb_image(client):
-    doc = {
-        "title": "400 Bad Request",
-        "description": "Max file size is 2MB"
-    }
-
-    query = {
-        "query": '''
-            mutation {
-                createPost(data: {content:"imagetest_post-1"}) {
-                    post {
-                        content
-                    }
-                }
-            }
-        '''
-    }
-    fake_image_byte = b"a" * (2 * 1024 * 1024 + 1)
-    
-    m = MultipartEncoder(
-    fields={'data': ('data', json.dumps(query), 'application/json'),
-            'image': ('a.png', fake_image_byte, 'image/png')}
-    )
-    
-    response = client.simulate_post('/api/graphql', content_type=m.content_type, body=m.to_string(), headers={
-        "Authorization": my_token,
-    })
-
-    result_doc = json.loads(response.content.decode())
-
-    assert result_doc == doc
-    assert response.status == falcon.HTTP_400
-
-def test_create_post_with_valid_image(client):
-    doc = {
-        "createPost": {
-            "post": {
-                "content": "imagetest_post-1",
-                "image": "test/images/post/0000000006.png",
-            }
-        },
-    }
-
-    query = {
-        "query": '''
-            mutation {
-                createPost(data: {content:"imagetest_post-1"}) {
-                    post {
-                        content
-                        image
-                    }
-                }
-            }
-        '''
-    }
-    fake_image_byte = b"a" * (2 * 1024 * 1024)
-    
-    m = MultipartEncoder(
-    fields={'data': ('data', json.dumps(query), 'application/json'),
-            'image': ('a.png', fake_image_byte, 'image/png')}
-    )
-    
-    response = client.simulate_post('/api/graphql', content_type=m.content_type, body=m.to_string(), headers={
-        "Authorization": my_token,
-    })
-
-    result_doc = json.loads(response.content.decode())
-
-    assert result_doc == doc
-    assert response.status == falcon.HTTP_OK
-
-    with open(doc['createPost']['post']['image'], 'rb') as f:
-        assert f.read() == fake_image_byte
 

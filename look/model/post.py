@@ -2,7 +2,7 @@ from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.dialects.mysql import INTEGER, VARCHAR, BIGINT
 
-from look.model.base import Base
+from . import Base
 
 class Post(Base):
     __tablename__ = 'post'

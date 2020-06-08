@@ -109,12 +109,12 @@ def create_base_schema():
             mutation_field[f"update_{tablename}"] = create_mutation_field(f"Update{tablename}", model, update_mutate, input_classes[tablename])
             mutation_field[f"delete_{tablename}"] = create_mutation_field(f"Delete{tablename}", model, delete_mutate, input_classes[tablename])
 
-        tmp_node = create_node_class(f"{tablename}Node", model, FCF.factory)
+        tmp_node = create_node_class(f"{tablename}Node", model._meta.model, FCF.factory)
         
         tmp_node._meta.connection.total_count = graphene.Int()
         tmp_node._meta.connection.resolve_total_count = lambda self, info, **kwargs: self.length
         tmp_node._meta.connection._meta.fields["total_count"] = graphene.Field(graphene.NonNull(graphene.Int))
-
+        
         tmp_connection = create_connection_class(
             f"{tablename}Connection",
             tmp_node,
