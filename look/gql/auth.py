@@ -1,4 +1,5 @@
 import os
+import re
 import jwt
 import json
 import graphene
@@ -8,6 +9,9 @@ import shutil
 from hashlib import sha256
 
 from look.config import Config
+from look.exc.handler import CodeduExceptionHandler
+
+from falcon import HTTP_200, before, HTTPBadRequest, HTTPUnauthorized
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -15,7 +19,7 @@ from graphene_sqlalchemy.converter import convert_sqlalchemy_type
 
 from . import gql_models
 from .util import create_input_class, create_mutation_field, get_instance_by_pk, check_row_by_user_id, \
-    db_session_flush, image_handle
+    db_session_flush, image_handle, validate_user_data
 
 def create_auth_schema():
     def login_mutate(cls, info, model=None, **kwargs):
@@ -27,7 +31,7 @@ def create_auth_schema():
             try:
                 user = query.filter(model.email == data['email']).one()
             except NoResultFound:
-                raise Exception("USER NOT FOUND")
+                raise CodeduExceptionHandler(HTTPBadRequest(description="USER NOT FOUND"))
 
             if user.password == hmac.new(Config.SECRET_KEY.encode(), data['password'].encode(), sha256).hexdigest():
                 encoded_jwt = jwt.encode({
@@ -39,14 +43,15 @@ def create_auth_schema():
                 }, Config.SECRET_KEY, algorithm='HS256')
 
                 return cls(**{'user':user, 'token': encoded_jwt.decode()})
-            else: raise Exception("INVALID PASSWORD")
-        else: raise Exception("INVALID PARAMETER")
+            else: raise CodeduExceptionHandler(HTTPBadRequest(description="INVALID PASSWORD"))
+        else: raise CodeduExceptionHandler(HTTPBadRequest(description="INVALID PARAMETER"))
 
     def register_mutate(cls, info, model=None, **kwargs):
         model = model._meta.model
         data = kwargs.get('data', None)
         image_info = info.context.get('image_info', None)
         if data:
+            validate_user_data(data)
             data['password'] = hmac.new(Config.SECRET_KEY.encode(), data['password'].encode(), sha256).hexdigest()
             db_session = info.context.get('session', None)
             if db_session:
@@ -66,11 +71,12 @@ def create_auth_schema():
             data = kwargs.get('data', None)
             image_info = info.context.get('image_info', None)
             if data:
+                validate_user_data(data)
                 if not info.context['auth']['data']['admin']:
                     data['id'] = info.context['auth']['data']['user_id']
                     data['password'] = hmac.new(Config.SECRET_KEY.encode(), data['password'].encode(), sha256).hexdigest()
                 else:
-                    if not 'id' in data: raise Exception("INVALID PARAMETER")
+                    if not 'id' in data: CodeduExceptionHandler(HTTPBadRequest(description="INVALID PARAMETER"))
                     if 'password' in data: del data['password']
                     
                 instance = get_instance_by_pk(query, model, data)
@@ -82,10 +88,9 @@ def create_auth_schema():
                     instance.update(data)
                     return cls(**{model.__tablename__:instance.one()})
                 else:
-                    raise Exception("INVALID PASSWORD")
+                    raise CodeduExceptionHandler(HTTPBadRequest(description="INVALID PASSWORD"))
         else:
-            # raise Exception(json.dumps({'status':401, 'description':info.context['auth']['description']}))
-            raise Exception(info.context['auth']['description'])
+            raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
 
     def update_password_mutate(cls, info, model=None, **kwargs):
         if info.context['auth']['data']:
@@ -93,6 +98,7 @@ def create_auth_schema():
             model = model._meta.model
             data = kwargs.get('data', None)
             if data:
+                validate_user_data(data)
                 if not info.context['auth']['data']['admin']:
                     data['id'] = info.context['auth']['data']['user_id']
                     data['password'] = hmac.new(Config.SECRET_KEY.encode(), data['password'].encode(), sha256).hexdigest()
@@ -106,9 +112,9 @@ def create_auth_schema():
                     instance.update(data)
                     return cls(**{model.__tablename__:instance.one()})
                 else:
-                    raise Exception('INVALID PASSWORD')
+                    raise CodeduExceptionHandler(HTTPBadRequest(description="INVALID PASSWORD"))
         else:
-            raise Exception(info.context['auth']['description'])
+            raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
 
     def delete_account_mutate(cls, info, model=None, **kwargs):
         if info.context['auth']['data']:
@@ -127,9 +133,9 @@ def create_auth_schema():
                     instance.delete()
                     return cls(**{model.__tablename__:tmp_instance})
                 else:
-                    raise Exception('INVALID PASSWORD')
+                    raise CodeduExceptionHandler(HTTPBadRequest(description="INVALID PASSWORD"))
         else:
-            raise Exception(info.context['auth']['description'])
+            raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
     
     query_field = {}
     mutation_field = {}

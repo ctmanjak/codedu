@@ -1,8 +1,10 @@
 import datetime
 import hmac
 from hashlib import sha256
-
 import graphene
+
+from falcon import HTTPBadRequest, HTTPUnauthorized
+
 from graphene_sqlalchemy import SQLAlchemyObjectType
 from graphene_sqlalchemy.converter import convert_sqlalchemy_type
 from graphene_sqlalchemy_filter import FilterableConnectionField
@@ -19,7 +21,7 @@ def create_base_schema():
         search = info.context.get('search', None)
         
         if 'password' in kwargs:
-            raise Exception("you can't find user with password")
+            raise CodeduExceptionHandler(HTTPBadRequest(description="you can't find user with password"))
 
         for arg, value in kwargs.items():
             if search:
@@ -58,9 +60,9 @@ def create_base_schema():
                     instance.update(data)
                     return cls(**{model.__tablename__:instance.one()})
                 else:
-                    raise Exception('PERMISSION DENIED')
+                    raise CodeduExceptionHandler(HTTPUnauthorized(description='PERMISSION DENIED'))
         else:
-            raise Exception(info.context['auth']['description'])
+            raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
 
     def delete_mutate(cls, info, model=None, **kwargs):
         if info.context['auth']['data']:
@@ -76,9 +78,9 @@ def create_base_schema():
                     instance.delete()
                     return cls(**{model.__tablename__:tmp_instance})
                 else:
-                    raise Exception('PERMISSION DENIED')
+                    raise CodeduExceptionHandler(HTTPUnauthorized(description='PERMISSION DENIED'))
         else:
-            raise Exception(info.context['auth']['description'])
+            raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
 
     query_field = {}
     mutation_field = {}

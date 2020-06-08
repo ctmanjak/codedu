@@ -1,5 +1,9 @@
 import graphene
 
+from look.exc.handler import CodeduExceptionHandler
+
+from falcon import HTTPUnauthorized
+
 from . import gql_models
 from .util import create_input_class, create_mutation_field, get_instance_by_pk, check_row_by_user_id, \
     db_session_flush, image_handle
@@ -23,7 +27,7 @@ def create_post_schema():
 
                 return cls(**{model.__tablename__:instance})
         else:
-            raise Exception(info.context['auth']['description'])
+            raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
 
     def update_post_mutate(cls, info, model=None, **kwargs):
         if info.context['auth']['data']:
@@ -40,9 +44,9 @@ def create_post_schema():
                     instance.update(data)
                     return cls(**{model.__tablename__:instance.one()})
                 else:
-                    raise Exception("PERMISSION DENIED")
+                    raise CodeduExceptionHandler(HTTPUnauthorized(description="PERMISSION DENIED"))
         else:
-            raise Exception(info.context['auth']['description'])
+            raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
 
     def delete_post_mutate(cls, info, model=None, **kwargs):
         if info.context['auth']['data']:
@@ -57,9 +61,9 @@ def create_post_schema():
                     instance.delete()
                     return cls(**{model.__tablename__:tmp_instance})
                 else:
-                    raise Exception("PERMISSION DENIED")
+                    raise CodeduExceptionHandler(HTTPUnauthorized(description="PERMISSION DENIED"))
         else:
-            raise Exception(info.context['auth']['description'])
+            raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
 
     query_field = {}
     mutation_field = {}

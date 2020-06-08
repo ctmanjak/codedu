@@ -1,8 +1,11 @@
 import os
+import re
 import sys
 import graphene
 
 from traceback import print_exc
+
+from look.exc.handler import CodeduExceptionHandler
 
 from falcon import HTTPBadRequest, HTTPInternalServerError
 
@@ -105,15 +108,15 @@ def db_session_flush(db_session):
         db_session.flush()
     except IntegrityError:
         db_session.rollback()
-        raise Exception("INTEGRITY ERROR")
+        raise CodeduExceptionHandler(HTTPBadRequest(description="INTEGRITY ERROR"))
     except OperationalError:
         db_session.rollback()
         print_exc()
-        raise Exception("OPERATIONAL ERROR")
+        raise CodeduExceptionHandler(HTTPBadRequest(description="OPERATIONAL ERROR"))
     except:
         db_session.rollback()
         print_exc()
-        raise Exception("UNKNOWN ERROR")
+        raise CodeduExceptionHandler(HTTPBadRequest(description="UNKNOWN ERROR"))
 
 def image_handle(tablename, image_info, instance):
     if not os.path.isdir(f'{image_path}'): os.mkdir(f'{image_path}')
@@ -126,3 +129,22 @@ def image_handle(tablename, image_info, instance):
     image_info['name'] = f"{instance.id:010}"
 
     instance.image = f"{image_info['dir']}{image_info['name']}{image_info['ext']}"
+
+def validate_user_data(data):
+    username_validation = re.match(r"^(?=.*[A-Za-z_$])[A-Za-z_\d]{5,}$", data['username']) if 'username' in data else True
+    password_validation = re.match(r"^(?=.*[A-Za-z$])(?=.*\d)[A-Za-z@$!%*#?&\d]{8,}$", data['password']) if 'password' in data else True
+    email_validation = re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", data['email']) if 'email' in data else True
+    if not email_validation:
+        raise CodeduExceptionHandler(HTTPBadRequest(description="INVALID EMAIL ADDRESS"))
+    if not username_validation:
+        username_validation_2 = re.search(r"[^A-Za-z_\d]+", data['username'])
+        if username_validation_2:
+            raise CodeduExceptionHandler(HTTPBadRequest(description="Username can only contain alphanumeric characters and underscore."))
+        else:
+            raise CodeduExceptionHandler(HTTPBadRequest(description="Username must be at least 5 characters long and including at least one letter."))
+    if not password_validation:
+        password_validation_2 = re.search(r"[^A-Za-z@$!%*#?&\d]+", data['password'])
+        if password_validation_2:
+            raise CodeduExceptionHandler(HTTPBadRequest(description="Password contains characters that cannot be included."))
+        else:
+            raise CodeduExceptionHandler(HTTPBadRequest(description="Password must be at least 8 characters long and including at least one letter and one number."))

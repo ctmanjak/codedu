@@ -5,6 +5,7 @@ import graphene
 from urllib.parse import parse_qs
 
 from look.hook.authmanager import validate_token
+from look.exc.handler import CodeduExceptionHandler
 
 from falcon import HTTP_200, before, HTTPBadRequest, HTTPUnauthorized
 
@@ -26,34 +27,23 @@ class Collection(object):
 
     @before(validate_token, is_async=True)
     async def on_post(self, req, res):
-        result = await self.graphql_execute(req, res)
-        image_info = req.context.get('image_info', None)
-        
-        if not result.errors:
-            res.status = HTTP_200
-            res.body = json.dumps(result.data)
-        else:
-            if image_info:
-                if os.path.isfile(f"./{image_info['dir']}{image_info['name']}{image_info['ext']}"):
-                    os.remove(f"./{image_info['dir']}{image_info['name']}{image_info['ext']}")
-
-            # error = json.loads(result.errors[0].message)
-            # if error['status'] == 401:
-            #     raise HTTPUnauthorized(description=error)
-            # else:
-            #     raise HTTPBadRequest(description=error)
-            print(result.errors[0].message if hasattr(result.errors[0], 'message') else result.errors[0].args[0])
-            raise HTTPBadRequest(description=result.errors[0].message if hasattr(result.errors[0], 'message') else result.errors[0].args[0])
-            # res.status = falcon.HTTP_400
+        try:
+            result = await self.graphql_execute(req, res)
+            image_info = req.context.get('image_info', None)
             
-            # tmp_error = []
-            # for error in result.errors:
-            #     tmp_error.append({
-            #         'message': error.message,
-            #         'locations': {
-            #             'line': error.locations[0].line,
-            #             'column': error.locations[0].column,
-            #         },
-            #     })
-            # print(tmp_error)
-            # res.body = json.dumps(tmp_error)
+            if not result.errors:
+                res.status = HTTP_200
+                res.body = json.dumps(result.data)
+            else:
+                if image_info:
+                    if os.path.isfile(f"./{image_info['dir']}{image_info['name']}{image_info['ext']}"):
+                        os.remove(f"./{image_info['dir']}{image_info['name']}{image_info['ext']}")
+
+                raise CodeduExceptionHandler(result.errors[0].args[0])
+                print(result.errors)
+        except Exception as e:
+            description = e.description if hasattr(e, 'description') else 'UNKNOWN ERROR'
+            if hasattr(e, 'type'):
+                raise globals()[e.type](description=description)
+            else:
+                raise HTTPBadRequest(description=e.args)

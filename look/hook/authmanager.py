@@ -4,8 +4,6 @@ from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 
 from look.config import Config
 
-from falcon import HTTPUnauthorized
-
 async def validate_token(req, res, resource, params):
     tmp_auth = {
         'success':False,
@@ -25,6 +23,5 @@ async def validate_token(req, res, resource, params):
             tmp_auth['data'] = decoded_token
     else:
         tmp_auth['description'] = "토큰이 없는뎁쇼"
-        # raise HTTPUnauthorized(description="토큰이 없는뎁쇼")
 
     req.context['auth'] = tmp_auth

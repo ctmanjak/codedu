@@ -14,7 +14,7 @@ v = Validator()
 
 def test_create_post_without_token(client):
     doc = {
-        "title": "400 Bad Request",
+        "title": "401 Unauthorized",
         "description": "토큰이 없는뎁쇼",
     }
 
@@ -34,7 +34,7 @@ def test_create_post_without_token(client):
     result_doc = json.loads(response.content.decode())
 
     assert result_doc == doc
-    assert response.status == falcon.HTTP_400
+    assert response.status == falcon.HTTP_401
 
 def test_create_post(client):
     doc = {
@@ -87,7 +87,7 @@ def test_create_post(client):
 
 def test_update_post_without_token(client):
     doc = {
-        "title": "400 Bad Request",
+        "title": "401 Unauthorized",
         "description": "토큰이 없는뎁쇼",
     }
 
@@ -107,11 +107,11 @@ def test_update_post_without_token(client):
     result_doc = json.loads(response.content.decode())
 
     assert result_doc == doc
-    assert response.status == falcon.HTTP_400
+    assert response.status == falcon.HTTP_401
 
 def test_update_post_with_invalid_token(client):
     doc = {
-        "title": "400 Bad Request",
+        "title": "401 Unauthorized",
         "description": "PERMISSION DENIED",
     }
 
@@ -133,7 +133,7 @@ def test_update_post_with_invalid_token(client):
     result_doc = json.loads(response.content.decode())
 
     assert result_doc == doc
-    assert response.status == falcon.HTTP_400
+    assert response.status == falcon.HTTP_401
 
 def test_update_post_with_valid_token(client):
     doc = {
@@ -166,7 +166,7 @@ def test_update_post_with_valid_token(client):
 
 def test_delete_post_without_token(client):
     doc = {
-        "title": "400 Bad Request",
+        "title": "401 Unauthorized",
         "description": "토큰이 없는뎁쇼",
     }
 
@@ -186,11 +186,11 @@ def test_delete_post_without_token(client):
     result_doc = json.loads(response.content.decode())
 
     assert result_doc == doc
-    assert response.status == falcon.HTTP_400
+    assert response.status == falcon.HTTP_401
 
 def test_delete_post_with_invalid_token(client):
     doc = {
-        "title": "400 Bad Request",
+        "title": "401 Unauthorized",
         "description": "PERMISSION DENIED",
     }
 
@@ -212,7 +212,7 @@ def test_delete_post_with_invalid_token(client):
     result_doc = json.loads(response.content.decode())
 
     assert result_doc == doc
-    assert response.status == falcon.HTTP_400
+    assert response.status == falcon.HTTP_401
 
 def test_delete_post_with_valid_token(client):
     doc = {

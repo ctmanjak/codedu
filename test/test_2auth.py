@@ -134,7 +134,7 @@ def test_login_with_invalid_password(client):
 
 def test_update_user_without_token(client):
     doc = {
-        "title": "400 Bad Request",
+        "title": "401 Unauthorized",
         "description": "토큰이 없는뎁쇼",
     }
 
@@ -156,7 +156,7 @@ def test_update_user_without_token(client):
     result_doc = json.loads(response.content.decode())
 
     assert result_doc == doc
-    assert response.status == falcon.HTTP_400
+    assert response.status == falcon.HTTP_401
 
 def test_update_user_with_invalid_token(client):
     doc = {
@@ -220,7 +220,7 @@ def test_update_user_with_valid_token(client):
 
 def test_update_password_without_token(client):
     doc = {
-        "title": "400 Bad Request",
+        "title": "401 Unauthorized",
         "description": "토큰이 없는뎁쇼",
     }
 
@@ -242,7 +242,7 @@ def test_update_password_without_token(client):
     result_doc = json.loads(response.content.decode())
 
     assert result_doc == doc
-    assert response.status == falcon.HTTP_400
+    assert response.status == falcon.HTTP_401
 
 def test_update_password_with_invalid_token(client):
     doc = {
@@ -307,7 +307,7 @@ def test_update_password_with_valid_token(client):
 
 def test_delete_account_without_token(client):
     doc = {
-        "title": "400 Bad Request",
+        "title": "401 Unauthorized",
         "description": "토큰이 없는뎁쇼",
     }
 
@@ -329,7 +329,7 @@ def test_delete_account_without_token(client):
     result_doc = json.loads(response.content.decode())
 
     assert result_doc == doc
-    assert response.status == falcon.HTTP_400
+    assert response.status == falcon.HTTP_401
 
 def test_delete_account_with_invalid_token(client):
     doc = {
@@ -592,7 +592,7 @@ def test_register_with_valid_image(client):
     
     response = client.simulate_post('/api/graphql', content_type=m.content_type, body=m.to_string())
 
-    result_doc = json.loads(response.content.decode())
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
 
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
@@ -600,3 +600,272 @@ def test_register_with_valid_image(client):
     with open(doc['register']['user']['image'], 'rb') as f:
         assert f.read() == fake_image_byte
 
+def test_register_with_invalid_email_1(client):
+    doc = {
+        "title": "400 Bad Request",
+        "description": "INVALID EMAIL ADDRESS",
+    }
+
+    body = {
+        "query": '''
+            mutation {
+                register(data: {username:"invaliduser", email:"invaliduser@@email.com", password:"invaliduser123!"}) {
+                    user {
+                        email
+                        username
+                        password
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    response = client.simulate_post('/api/graphql', content_type="application/json", body=json.dumps(body))
+
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_400
+
+def test_register_with_invalid_email_2(client):
+    doc = {
+        "title": "400 Bad Request",
+        "description": "INVALID EMAIL ADDRESS",
+    }
+
+    body = {
+        "query": '''
+            mutation {
+                register(data: {username:"invaliduser", email:"invaliduseremail.com", password:"invaliduser123!"}) {
+                    user {
+                        email
+                        username
+                        password
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    response = client.simulate_post('/api/graphql', content_type="application/json", body=json.dumps(body))
+
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_400
+
+def test_register_with_invalid_email_3(client):
+    doc = {
+        "title": "400 Bad Request",
+        "description": "INVALID EMAIL ADDRESS",
+    }
+
+    body = {
+        "query": '''
+            mutation {
+                register(data: {username:"invaliduser", email:"invaliduser@emailcom", password:"invaliduser123!"}) {
+                    user {
+                        email
+                        username
+                        password
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    response = client.simulate_post('/api/graphql', content_type="application/json", body=json.dumps(body))
+
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_400
+
+def test_register_with_invalid_password_1(client):
+    doc = {
+        "title": "400 Bad Request",
+        "description": "Password contains characters that cannot be included.",
+    }
+
+    body = {
+        "query": '''
+            mutation {
+                register(data: {username:"invaliduser", email:"invaliduser@email.com", password:"aaaaaa1..."}) {
+                    user {
+                        email
+                        username
+                        password
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    response = client.simulate_post('/api/graphql', content_type="application/json", body=json.dumps(body))
+
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_400
+
+def test_register_with_invalid_password_2(client):
+    doc = {
+        "title": "400 Bad Request",
+        "description": "Password must be at least 8 characters long and including at least one letter and one number.",
+    }
+
+    body = {
+        "query": '''
+            mutation {
+                register(data: {username:"invaliduser", email:"invaliduser@email.com", password:"aaaaaa1"}) {
+                    user {
+                        email
+                        username
+                        password
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    response = client.simulate_post('/api/graphql', content_type="application/json", body=json.dumps(body))
+
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_400
+
+def test_register_with_invalid_password_3(client):
+    doc = {
+        "title": "400 Bad Request",
+        "description": "Password must be at least 8 characters long and including at least one letter and one number.",
+    }
+
+    body = {
+        "query": '''
+            mutation {
+                register(data: {username:"invaliduser", email:"invaliduser@email.com", password:"aaaaaaaaa"}) {
+                    user {
+                        email
+                        username
+                        password
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    response = client.simulate_post('/api/graphql', content_type="application/json", body=json.dumps(body))
+
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_400
+
+def test_register_with_invalid_password_4(client):
+    doc = {
+        "title": "400 Bad Request",
+        "description": "Password must be at least 8 characters long and including at least one letter and one number.",
+    }
+
+    body = {
+        "query": '''
+            mutation {
+                register(data: {username:"invaliduser", email:"invaliduser@email.com", password:"123123123"}) {
+                    user {
+                        email
+                        username
+                        password
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    response = client.simulate_post('/api/graphql', content_type="application/json", body=json.dumps(body))
+
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_400
+
+def test_register_with_invalid_password_5(client):
+    doc = {
+        "title": "400 Bad Request",
+        "description": "Password must be at least 8 characters long and including at least one letter and one number.",
+    }
+
+    body = {
+        "query": '''
+            mutation {
+                register(data: {username:"invaliduser", email:"invaliduser@email.com", password:"123123123!!!"}) {
+                    user {
+                        email
+                        username
+                        password
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    response = client.simulate_post('/api/graphql', content_type="application/json", body=json.dumps(body))
+
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_400
+
+def test_register_with_invalid_username_1(client):
+    doc = {
+        "title": "400 Bad Request",
+        "description": "Username must be at least 5 characters long and including at least one letter.",
+    }
+
+    body = {
+        "query": '''
+            mutation {
+                register(data: {username:"inva", email:"invaliduser@email.com", password:"invaliduser123!"}) {
+                    user {
+                        email
+                        username
+                        password
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    response = client.simulate_post('/api/graphql', content_type="application/json", body=json.dumps(body))
+
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_400
+
+def test_register_with_invalid_username_1(client):
+    doc = {
+        "title": "400 Bad Request",
+        "description": "Username can only contain alphanumeric characters and underscore.",
+    }
+
+    body = {
+        "query": '''
+            mutation {
+                register(data: {username:"invaliduser!", email:"invaliduser@email.com", password:"invaliduser123!"}) {
+                    user {
+                        email
+                        username
+                        password
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    response = client.simulate_post('/api/graphql', content_type="application/json", body=json.dumps(body))
+
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_400
