@@ -1,6 +1,7 @@
 version: '3.7'
 volumes:
   codedu_db:
+  codedu_image:
   
 services:
   mariadb:
@@ -51,6 +52,8 @@ services:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
       PYTHONUNBUFFERED: 0
+    volumes:
+      - codedu_image:/codedu/images
     command: ["uvicorn", "look.app:socket", "--host", "0", "--proxy-headers"]
 
   nginx:
@@ -67,6 +70,8 @@ services:
       placement:
         constraints:
           - "node.role==manager"
+    volumes:
+      - codedu_image:/codedu/images
     depends_on:
       - falcon
 
