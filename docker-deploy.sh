@@ -110,6 +110,5 @@ if [ "${NFS_SERVER_IP}" ]; then
         docker stack deploy -c ./docker/docker-compose.yml codedu
     fi
 else
-    echo "failed create nfs_server container. check docker logs nfs_server."
-    echo "try modprobe nfs"
+    echo "failed create nfs_server container. check log."
 fi
