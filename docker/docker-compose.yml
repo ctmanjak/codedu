@@ -2,7 +2,16 @@ version: '3.7'
 volumes:
   codedu_db:
   codedu_image:
-  
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "nolock,rw,soft,addr=${NFS_SERVER_IP}"
+      device: ":/codedu/images"
+networks:
+  default:
+  codedu_net:
+    external: true
+    attachable: true
 services:
   mariadb:
     image: mariadb
@@ -20,6 +29,9 @@ services:
           - "node.role==manager"
   falcon:
     image: ctmanjak/codedu_falcon
+    networks:
+      - default
+      - codedu_net
     build:
       context: ..
       dockerfile: ./docker/Dockerfile-falcon
@@ -58,14 +70,14 @@ services:
 
   nginx:
     image: nginx
+    networks:
+      - default
+      - codedu_net
     configs:
       - source: nginx_conf
         target: /etc/nginx/conf.d/default.conf
     ports:
-      - mode: host
-        protocol: tcp
-        published: 80
-        target: 80
+      - 80:80
     deploy:
       placement:
         constraints:
