@@ -31,8 +31,7 @@ if [ -d "/etc/docker" ]; then
 
     rm -v client.csr server.csr extfile.cnf extfile-client.cnf
 
-    chmod -v 0400 ca-key.pem key.pem server-key.pem
-    chmod -v 0444 ca.pem server-cert.pem cert.pem
+    chmod -v 0444 {ca-key,key,server-key,ca,server-cert,cert}.pem
 
     if [ ! -d ~/.docker ]; then
         mkdir ~/.docker
@@ -41,7 +40,7 @@ if [ -d "/etc/docker" ]; then
 
     tar cvf ../secrets.tar ca.pem cert.pem key.pem
     echo "copy secrets.tar to dev-client and encrypting secrets.tar with travis for continuous deployment"
-    echo "secrets.tar should be in {project_path}/docker/"
+    echo "secrets.tar should be in {project_path}/"
     echo "more info about encrypting file with travis in https://docs.travis-ci.com/user/encrypting-files/"
     echo "\nyou need run\n
     export DOCKER_HOST=tcp://${HOSTNAME}:2376 DOCKER_TLS_VERIFY=1\n
