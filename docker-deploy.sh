@@ -39,7 +39,7 @@ if ! docker ps | grep -wq nfs_server; then
     fi
     
     echo "creating nfs_server"
-    docker run -v nfs_image:/codedu/images -e NFS_EXPORT_0='/codedu/images *(rw,no_root_squash,no_subtree_check)' \
+    docker run -d -v nfs_image:/codedu/images -e NFS_EXPORT_0='/codedu/images *(rw,no_root_squash,no_subtree_check)' \
         --privileged --network codedu_net --network-alias nfs_server --name nfs_server \
         erichough/nfs-server
     
@@ -110,5 +110,5 @@ if [ "${NFS_SERVER_IP}" ]; then
         docker stack deploy -c ./docker/docker-compose.yml codedu
     fi
 else
-    echo "failed create nfs_server container. check log."
+    echo "failed create nfs_server container. check docker logs nfs_server."
 fi
