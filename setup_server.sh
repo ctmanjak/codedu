@@ -2,6 +2,8 @@
 
 sh install_docker.sh
 
+apt-get install nfs-common -y
+
 tmp_file="$HOME/docker-override.conf"
 
 {

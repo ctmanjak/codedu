@@ -50,7 +50,7 @@ fi
 
 export NFS_SERVER_IP=$(docker inspect nfs_server | grep -oP '"IPAddress": "\K[\d.]+')
 
-if [ "${NFS_SERVER_IP}" ]; then
+if [ ! "${NFS_SERVER_IP}" = "" ]; then
     export MARIADB_CONF_VER=$(md5sum ./config/mariadb_default.cnf | awk '{print $1}')
     export NGINX_CONF_VER=$(md5sum ./config/nginx_default.conf | awk '{print $1}')
 
