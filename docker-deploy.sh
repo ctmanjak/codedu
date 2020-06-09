@@ -37,6 +37,9 @@ if ! docker ps | grep -wq nfs_server; then
     if docker ps -a | grep -wq nfs_server; then
         docker rm -f nfs_server
     fi
+    if ! lsmod | grep -wq "nfs"; then
+        modprobe nfs
+    fi
     echo "creating nfs_server"
     docker run -d -v nfs_image:/codedu/images -e NFS_EXPORT_0='/codedu/images *(rw,no_root_squash)' \
         --privileged --network codedu_net --network-alias nfs_server --name nfs_server \
