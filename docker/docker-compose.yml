@@ -4,9 +4,9 @@ volumes:
   codedu_image:
     driver: local
     driver_opts:
-      type: "nfs"
-      o: "nolock,rw,soft,addr=${NFS_SERVER_IP}"
-      device: ":/codedu/images"
+      type: "nfs4"
+      o: "nfsvers=4.2,nolock,rw,soft,addr=${NFS_SERVER_IP}"
+      device: ":/"
 networks:
   default:
   codedu_net:

@@ -31,7 +31,7 @@ fi
 
 if ! docker network ls | grep -wq codedu_net; then
     echo "creating codedu_net"
-    docker network create --attachable --scope swarm codedu_net
+    docker network create -d overlay --attachable --scope swarm codedu_net
 fi
 if ! docker ps | grep -wq nfs_server; then
     if docker ps -a | grep -wq nfs_server; then
@@ -39,8 +39,8 @@ if ! docker ps | grep -wq nfs_server; then
     fi
     
     echo "creating nfs_server"
-    docker run -d -v nfs_image:/codedu/images -e NFS_EXPORT_0='/codedu/images *(rw,no_root_squash,no_subtree_check)' \
-        --privileged --network codedu_net --network-alias nfs_server --name nfs_server \
+    docker run -d -v nfs_image:/codedu/images -e NFS_EXPORT_0='/codedu/images *(rw,no_root_squash,no_subtree_check,fsid=0)' \
+        --privileged --network codedu_net --network-alias nfs_server --name nfs_server -p 2049:2049 \
         erichough/nfs-server
     
     # docker service create -d --mount type=volume,source=nfs_image,destination=/codedu/images \
