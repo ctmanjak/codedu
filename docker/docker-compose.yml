@@ -1,17 +1,12 @@
 version: '3.7'
 volumes:
   codedu_db:
-  # codedu_image:
-  #   driver: local
-  #   driver_opts:
-  #     type: "nfs4"
-  #     o: "nfsvers=4.2,nolock,rw,soft,addr=${NFS_SERVER_IP}"
-  #     device: ":/"
-# networks:
-#   default:
-#   codedu_net:
-#     external: true
-#     attachable: true
+  codedu_image:
+    driver: local
+    driver_opts:
+      type: "nfs4"
+      o: "nfsvers=4.2,nolock,rw,soft,addr=${NFS_SERVER_IP}"
+      device: ":/"
 services:
   mariadb:
     image: mariadb
@@ -29,9 +24,6 @@ services:
           - "node.role==manager"
   falcon:
     image: ctmanjak/codedu_falcon
-    # networks:
-    #   - default
-    #   - codedu_net
     build:
       context: ..
       dockerfile: ./docker/Dockerfile-falcon
@@ -64,15 +56,12 @@ services:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
       PYTHONUNBUFFERED: 0
-    # volumes:
-    #   - codedu_image:/codedu/images
+    volumes:
+      - codedu_image:/codedu/images
     command: ["uvicorn", "look.app:socket", "--host", "0", "--proxy-headers"]
 
   nginx:
     image: nginx
-    # networks:
-    #   - default
-    #   - codedu_net
     configs:
       - source: nginx_conf
         target: /etc/nginx/conf.d/default.conf
@@ -82,8 +71,8 @@ services:
       placement:
         constraints:
           - "node.role==manager"
-    # volumes:
-    #   - codedu_image:/codedu/images
+    volumes:
+      - codedu_image:/codedu/images
     depends_on:
       - falcon
 
