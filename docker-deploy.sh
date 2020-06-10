@@ -46,7 +46,7 @@ if ! docker ps | grep -wq nfs_server; then
     #     --network codedu_net --name nfs_server erichough/nfs-server
 fi
 
-export NFS_SERVER_IP=$HOST_IP
+export NFS_SERVER_IP=$(docker info | grep -oP 'Node Address: \K[\d.]+')
 
 export MARIADB_CONF_VER=$(md5sum ./config/mariadb_default.cnf | awk '{print $1}')
 export NGINX_CONF_VER=$(md5sum ./config/nginx_default.conf | awk '{print $1}')
