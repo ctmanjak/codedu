@@ -4,8 +4,8 @@ volumes:
   codedu_image:
     driver: local
     driver_opts:
-      type: "nfs4"
-      o: "nfsvers=4.2,nolock,rw,soft,addr=${NFS_SERVER_IP}"
+      type: "nfs"
+      o: "nfsvers=4.2,nolock,rw,soft,timeo=30,addr=${NFS_SERVER_IP}"
       device: ":/"
 services:
   mariadb:
