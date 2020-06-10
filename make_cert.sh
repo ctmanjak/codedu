@@ -42,7 +42,7 @@ if [ -d "/etc/docker" ]; then
     echo "copy secrets.tar to dev-client and encrypting secrets.tar with travis for continuous deployment"
     echo "secrets.tar should be in {project_path}/"
     echo "more info about encrypting file with travis in https://docs.travis-ci.com/user/encrypting-files/"
-    echo "\nyou need run\n
+    echo -e "\nyou need run\n
     export DOCKER_HOST=tcp://${HOSTNAME}:2376 DOCKER_TLS_VERIFY=1\n
     or add it to ~/.bashrc for access docker"
 
@@ -54,7 +54,7 @@ if [ -d "/etc/docker" ]; then
     else
         path_dj=
         echo '${path_dj} already exists.'
-        echo "add\n
+        echo -e "add\n
         ${daemon_json}\n
         to ${path_dj}\n
         ex) {\"some-key\":\"some-value\"} ->\n
