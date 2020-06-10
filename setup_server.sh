@@ -5,11 +5,9 @@ sh install_docker.sh
 apt-get install nfs-common -y
 
 if [ -d /etc/modules-load.d ]; then
-    if [ -f /etc.modules-load.d/modules.conf ]; then
-        {
-            echo "nfs";
-            echo "nfsd";
-        } >> /etc/modules-load.d/modules.conf
+    if [ -f /etc/modules-load.d/modules.conf ]; then
+        echo "nfs" | sudo tee -a /etc/modules-load.d/modules.conf
+        echo "nfsd" | sudo tee -a /etc/modules-load.d/modules.conf
     fi
 fi
 systemctl restart systemd-modules-load
