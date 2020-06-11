@@ -33,13 +33,16 @@ fi
 
 if ! docker ps | grep -wq nfs_server; then
     if docker ps -a | grep -wq nfs_server; then
-        docker rm -f nfs_server
+        docker start nfs_server
+        sleep 0.5
+        if ! docker ps | grep -wq nfs_server; then
+            docker rm -f nfs_server
+            echo "creating nfs_server"
+            docker run -d -v nfs_image:/codedu/images -e NFS_EXPORT_0='/codedu/images *(rw,no_root_squash,no_subtree_check,fsid=0)' \
+                --privileged --name nfs_server -p 2049:2049 \
+                erichough/nfs-server
+        fi
     fi
-    
-    echo "creating nfs_server"
-    docker run -d -v nfs_image:/codedu/images -e NFS_EXPORT_0='/codedu/images *(rw,no_root_squash,no_subtree_check,fsid=0)' \
-        --privileged --name nfs_server -p 2049:2049 \
-        erichough/nfs-server
     
     # docker service create -d --mount type=volume,source=nfs_image,destination=/codedu/images \
     #     -e NFS_EXPORT_0='/codedu/images *(rw,no_root_squash)' --privileged -p 2049:2049 \
@@ -90,6 +93,10 @@ if docker stack ls | grep -wq "codedu"; then
     echo "updating codedu_falcon"
     docker pull ctmanjak/codedu_falcon
     docker service update codedu_falcon --force --image ctmanjak/codedu_falcon
+
+    echo "updating codedu_terminal"
+    docker pull ctmanjak/codedu_terminal
+    docker service update codedu_terminal --force --image ctmanjak/codedu_terminal
 
     if [[ ! "${PREV_NGINX_CONF}" || ! "${PREV_NGINX_CONF}" = "${CURRENT_NGINX_CONF}" ]]; then
         if ! docker config ls | grep -wq "${CURRENT_NGINX_CONF}"; then

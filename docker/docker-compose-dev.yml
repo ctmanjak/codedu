@@ -36,9 +36,19 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-    command: ["uvicorn", "look.app:socket", "--reload", "--host", "0"]
+    command: ["uvicorn", "look.app:app", "--reload", "--host", "0"]
     volumes:
       - ../:/codedu/
+
+  terminal:
+    image: ctmanjak/codedu_terminal
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+      PYTHONUNBUFFERED: 0
+    command: ["uvicorn", "terminal:socket", "--reload", "--host", "0", "--port", "8001"]
 
   nginx:
     image: nginx
@@ -49,3 +59,4 @@ services:
       - "8000:80"
     depends_on:
       - falcon
+      - terminal

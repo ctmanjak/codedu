@@ -3,7 +3,6 @@ import falcon
 import falcon.asgi
 
 from look.db import init_db, insert_dummy_data, truncate_table, drop_db, create_db
-from look.terminal import TerminalNamespace, init_socket
 from look.api import auth, db, gql
 from look.middleware.requestdatamanager import RequetDataManager
 from look.middleware.dbmanager import DBManager
@@ -29,9 +28,6 @@ middleware = [
 ]
 
 app = application = falcon.asgi.App(middleware=middleware)
-socket, sio = init_socket(app)
-sio.register_namespace(TerminalNamespace('/', sio))
-# app.add_middleware(SocketManager(sio))
 
 app.req_options.strip_url_path_trailing_slash = True
 app.req_options.media_handlers.update(handlers)

@@ -58,8 +58,16 @@ services:
       PYTHONUNBUFFERED: 0
     volumes:
       - codedu_image:/codedu/images
-    command: ["uvicorn", "look.app:socket", "--host", "0", "--proxy-headers"]
-
+    command: ["uvicorn", "look.app:app", "--host", "0", "--proxy-headers"]
+  terminal:
+    image: ctmanjak/codedu_terminal
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+      PYTHONUNBUFFERED: 0
+    command: ["uvicorn", "terminal:socket", "--host", "0", "--port", "8001", "--proxy-headers"]
   nginx:
     image: nginx
     configs:
@@ -75,7 +83,6 @@ services:
       - codedu_image:/codedu/images
     depends_on:
       - falcon
-
 configs:
   mariadb_conf:
     name: mariadb_conf-${MARIADB_CONF_VER}
