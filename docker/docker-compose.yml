@@ -67,6 +67,10 @@ services:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
       PYTHONUNBUFFERED: 0
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
     command: ["uvicorn", "terminal:socket", "--host", "0", "--port", "8001", "--proxy-headers"]
   nginx:
     image: nginx
