@@ -47,7 +47,7 @@ if [ -d "/etc/docker" ]; then
     or add it to ~/.bashrc for access docker"
 
     path_dj="/etc/docker/daemon.json"
-    daemon_json="\"hosts\":[\"tcp://0.0.0.0:2376\"],\"tls\":true,\"tlsverify\":true,\"tlscacert\":\"$(pwd)/ca.pem\",\"tlscert\":\"$(pwd)/server-cert.pem\",\"tlskey\":\"$(pwd)/server-key.pem\""
+    daemon_json="\"hosts\":[\"unix:///var/run/docker.sock\",\"tcp://0.0.0.0:2376\"],\"tls\":true,\"tlsverify\":true,\"tlscacert\":\"$(pwd)/ca.pem\",\"tlscert\":\"$(pwd)/server-cert.pem\",\"tlskey\":\"$(pwd)/server-key.pem\""
     if [ ! -f "${path_dj}" ]; then
         echo "{${daemon_json}}" > ${path_dj}
         systemctl restart docker
