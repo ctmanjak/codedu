@@ -88,7 +88,7 @@ def create_filter_class(classname, db_model):
     fields = {}
     for colname, column in db_model.__table__.columns.items():
         if column.expression.foreign_keys or column.expression.primary_key:
-            fields[colname] = ['eq']
+            fields[colname] = ['eq', 'is_null']
         else:
             fields[colname] = [...]
     
