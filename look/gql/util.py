@@ -83,16 +83,25 @@ def create_connection_class(classname, model):
         "total_count": graphene.Int(),
         "resolve_total_count": lambda self, info, **kwargs: self.iterable.count(),
     })
-    
+
 def create_filter_class(classname, db_model):
-    fields = {key:[...] for key in db_model.__table__.columns.keys()}
+    fields = {}
+    for colname, column in db_model.__table__.columns.items():
+        if column.expression.foreign_keys or column.expression.primary_key:
+            fields[colname] = ['eq']
+        else:
+            fields[colname] = [...]
     
-    return type(classname, (FilterSet,), {
-        "Meta": type("Meta", (), {
-            "model": db_model,
-            "fields": fields,
-        }),
-    })
+    meta_field = {
+        "model": db_model,
+        "fields": fields,
+    }
+    class_field = {
+        "Meta": type("Meta", (), meta_field),
+    }
+
+    print(class_field)
+    return type(classname, (FilterSet,), class_field)
 
 def create_node_class(classname, db_model, connection_field_factory):
     return type(classname, (SQLAlchemyObjectType,), {
