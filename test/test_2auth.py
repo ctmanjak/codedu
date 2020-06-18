@@ -565,7 +565,7 @@ def test_register_with_valid_image(client):
                 "email": "imagetestuser@email.com",
                 "username": "imagetestuser",
                 "password": hmac.new(Config.SECRET_KEY.encode(), "imagetestuser123!".encode(), sha256).hexdigest(),
-                "image": "test/images/user/0000000009.png"
+                "image": "images/user/0000000009.png"
             }
         }
     }
@@ -598,7 +598,7 @@ def test_register_with_valid_image(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-    with open(doc['register']['user']['image'], 'rb') as f:
+    with open(f"test/{doc['register']['user']['image']}", 'rb') as f:
         assert f.read() == fake_image_byte
 
 def test_register_with_invalid_email_1(client):
@@ -875,7 +875,7 @@ def test_update_user_image(client):
     doc = {
         "updateUserInfo": {
             "user": {
-                "image": "test/images/user/0000000009.png",
+                "image": "images/user/0000000009.png",
             }
         }
     }
@@ -907,14 +907,14 @@ def test_update_user_image(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-    with open(doc['updateUserInfo']['user']['image'], 'rb') as f:
+    with open(f"test/{doc['updateUserInfo']['user']['image']}", 'rb') as f:
         assert f.read() == fake_image_byte
 
 def test_delete_user_image(client):
     doc = {
         "deleteAccount": {
             "user": {
-                "image": "test/images/user/0000000009.png",
+                "image": "images/user/0000000009.png",
             }
         }
     }
@@ -939,4 +939,4 @@ def test_delete_user_image(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-    assert not os.path.exists(doc['deleteAccount']['user']['image'])
+    assert not os.path.exists(f"test/{doc['deleteAccount']['user']['image']}")

@@ -139,7 +139,7 @@ def image_handle(tablename, instance, image_info=None):
         image_info['dir'] = f"{image_path}/{tablename}/"
         image_info['name'] = f"{instance_id}"
 
-        instance.image = f"{image_info['dir']}{image_info['name']}{image_info['ext']}"
+        instance.image = f"{image_info['dir'][len(root_path)+1:]}{image_info['name']}{image_info['ext']}"
 
 code_ext = {"python3":".py", "clang":".c"}
 
@@ -158,7 +158,7 @@ def code_handle(instance, code=None):
         if os.path.exists(full_path):
             os.remove(full_path)
 
-    instance.path = full_path
+    instance.path = full_path[len(root_path)+1:]
 
 def validate_user_data(data):
     username_validation = re.match(r"^(?=.*[가-힣A-Za-z_$])[가-힣A-Za-z_\d]{5,32}$", data['username']) if 'username' in data else True

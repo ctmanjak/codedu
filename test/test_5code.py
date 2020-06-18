@@ -46,21 +46,21 @@ def test_create_code_with_token(client):
             "code": {
                 "title": "pytest_code-1",
                 "lang": "python3",
-                "path": "test/codes/python3/0000000001/main.py",
+                "path": "codes/python3/0000000001/main.py",
             }
         },
         "CreateCode2": {
             "code": {
                 "title": "pytest_code-2",
                 "lang": "python3",
-                "path": "test/codes/python3/0000000002/main.py",
+                "path": "codes/python3/0000000002/main.py",
             }
         },
         "CreateCode3": {
             "code": {
                 "title": "pytest_code-3",
                 "lang": "python3",
-                "path": "test/codes/python3/0000000003/main.py",
+                "path": "codes/python3/0000000003/main.py",
             }
         },
     }
@@ -106,7 +106,7 @@ def test_create_code_with_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-    with open(doc['CreateCode1']['code']['path'], 'rb') as code1, open(doc['CreateCode2']['code']['path'], 'rb') as code2, open(doc['CreateCode3']['code']['path'], 'rb') as code3:
+    with open(f"test/{doc['CreateCode1']['code']['path']}", 'rb') as code1, open(f"test/{doc['CreateCode2']['code']['path']}", 'rb') as code2, open(f"test/{doc['CreateCode3']['code']['path']}", 'rb') as code3:
         assert code1.read().decode() == body['variables']['code1']
         assert code2.read().decode() == body['variables']['code2']
         assert code3.read().decode() == body['variables']['code3']
@@ -166,7 +166,7 @@ def test_update_post_with_valid_token(client):
         "updateCode": {
             "code": {
                 "title": "pytest_updatedcode-1",
-                "path": "test/codes/python3/0000000002/main.py",
+                "path": "codes/python3/0000000002/main.py",
             }
         }
     }
@@ -195,7 +195,7 @@ def test_update_post_with_valid_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-    with open(doc['updateCode']['code']['path'], 'rb') as f:
+    with open(f"test/{doc['updateCode']['code']['path']}", 'rb') as f:
         assert f.read().decode() == body['variables']['code']
 
 def test_delete_code_without_token(client):
@@ -253,7 +253,7 @@ def test_delete_code_with_valid_token(client):
         "deleteCode": {
             "code": {
                 "title": "pytest_code-3",
-                "path": "test/codes/python3/0000000003/main.py",
+                "path": "codes/python3/0000000003/main.py",
             }
         }
     }
@@ -279,14 +279,14 @@ def test_delete_code_with_valid_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-    assert not os.path.exists(doc['deleteCode']['code']['path'])
+    assert not os.path.exists(f"test/{doc['deleteCode']['code']['path']}")
 
 def test_update_code_by_admin(client):
     doc = {
         "updateCode": {
             "code": {
                 "title": "pytest_updatedbyadmin-1",
-                "path": "test/codes/python3/0000000002/main.py"
+                "path": "codes/python3/0000000002/main.py"
             }
         }
     }
@@ -315,7 +315,7 @@ def test_update_code_by_admin(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-    with open(doc['updateCode']['code']['path'], 'rb') as f:
+    with open(f"test/{doc['updateCode']['code']['path']}", 'rb') as f:
         assert f.read().decode() == body['variables']['code']
 
 def test_delete_code_by_admin(client):
@@ -323,7 +323,7 @@ def test_delete_code_by_admin(client):
         "deleteCode": {
             "code": {
                 "title": "pytest_updatedbyadmin-1",
-                "path": "test/codes/python3/0000000002/main.py",
+                "path": "codes/python3/0000000002/main.py",
             }
         }
     }
@@ -349,4 +349,4 @@ def test_delete_code_by_admin(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-    assert not os.path.exists(doc['deleteCode']['code']['path'])
+    assert not os.path.exists(f"test/{doc['deleteCode']['code']['path']}")

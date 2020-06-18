@@ -374,7 +374,7 @@ def test_create_post_with_valid_image(client):
         "createPost": {
             "post": {
                 "content": "imagetest_post-1",
-                "image": "test/images/post/0000000006.png",
+                "image": "images/post/0000000006.png",
             }
         },
     }
@@ -407,14 +407,14 @@ def test_create_post_with_valid_image(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-    with open(doc['createPost']['post']['image'], 'rb') as f:
+    with open(f"test/{doc['createPost']['post']['image']}", 'rb') as f:
         assert f.read() == fake_image_byte
 
 def test_update_post_image(client):
     doc = {
         "updatePost": {
             "post": {
-                "image": "test/images/post/0000000006.png",
+                "image": "images/post/0000000006.png",
             }
         }
     }
@@ -446,14 +446,14 @@ def test_update_post_image(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-    with open(doc['updatePost']['post']['image'], 'rb') as f:
+    with open(f"test/{doc['updatePost']['post']['image']}", 'rb') as f:
         assert f.read() == fake_image_byte
 
 def test_delete_post_image(client):
     doc = {
         "deletePost": {
             "post": {
-                "image": "test/images/post/0000000006.png",
+                "image": "images/post/0000000006.png",
             }
         }
     }
@@ -478,4 +478,4 @@ def test_delete_post_image(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-    assert not os.path.exists(doc['deletePost']['post']['image'])
+    assert not os.path.exists(f"test/{doc['deletePost']['post']['image']}")
