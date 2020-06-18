@@ -19,7 +19,7 @@ from graphene_sqlalchemy_filter import FilterableConnectionField, FilterSet
 
 if "pytest" in sys.modules:
     root_path = 'test'
-else: root_path = '.'
+else: root_path = 'nfs'
 
 def create_gql_model_class(classname, db_model, fields={}, meta_fields={}):
     tablename = db_model.__table__.fullname
@@ -136,7 +136,7 @@ def image_handle(tablename, instance, image_info=None):
             os.remove(f"./{image_path}/{tablename}/{instance_id}{ext}")
     if image_info:
         os.rename(f"./{image_info['dir']}{image_info['name']}{image_info['ext']}", f"./{image_path}/{tablename}/{instance_id}{image_info['ext']}")
-        image_info['dir'] = f"{image_path if not root_path == '.' else image_path[2:]}/{tablename}/"
+        image_info['dir'] = f"{image_path}/{tablename}/"
         image_info['name'] = f"{instance_id}"
 
         instance.image = f"{image_info['dir']}{image_info['name']}{image_info['ext']}"
@@ -150,7 +150,7 @@ def code_handle(instance, code=None):
     if not os.path.isdir(f'{code_path}/{instance.lang}'): os.mkdir(f'{code_path}/{instance.lang}')
     if not os.path.isdir(f'{code_path}/{instance.lang}/{code_id}'): os.mkdir(f'{code_path}/{instance.lang}/{code_id}')
     
-    full_path = f"{code_path if not root_path == '.' else code_path[2:]}/{instance.lang}/{code_id}/main{code_ext[instance.lang]}"
+    full_path = f"{code_path}/{instance.lang}/{code_id}/main{code_ext[instance.lang]}"
     if code:
         with open(full_path, "w") as f:
             f.write(code)

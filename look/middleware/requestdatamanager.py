@@ -9,7 +9,7 @@ from falcon import HTTPBadRequest
 
 if "pytest" in sys.modules:
     root_path = 'test'
-else: root_path = '.'
+else: root_path = 'nfs'
 
 class RequetDataManager(object):
         allowed_image = ['image/png', 'image/jpeg']
