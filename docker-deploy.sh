@@ -38,10 +38,8 @@ if ! docker ps | grep -wq nfs_server; then
         if ! docker ps | grep -wq nfs_server; then
             docker rm -f nfs_server
             echo "creating nfs_server"
-            docker run -d -v nfs_image:/codedu/images -v nfs_code:/codedu/codes \
+            docker run -d -v nfs_codedu:/codedu \
                 -e NFS_EXPORT_0='/codedu *(rw,no_root_squash,no_subtree_check,fsid=0)' \
-                -e NFS_EXPORT_1='/codedu/images *(rw,no_root_squash,no_subtree_check)' \
-                -e NFS_EXPORT_2='/codedu/codes *(rw,no_root_squash,no_subtree_check)' \
                 --privileged --name nfs_server -p 2049:2049 \
                 erichough/nfs-server
         fi
