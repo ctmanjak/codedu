@@ -6,7 +6,13 @@ volumes:
     driver_opts:
       type: "nfs"
       o: "nfsvers=4.2,nolock,rw,soft,timeo=30,addr=${NFS_SERVER_IP}"
-      device: ":/"
+      device: ":/codedu/images"
+  codedu_code:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "nfsvers=4.2,nolock,rw,soft,timeo=30,addr=${NFS_SERVER_IP}"
+      device: ":/codedu/codes"
 services:
   mariadb:
     image: mariadb
@@ -58,11 +64,13 @@ services:
       PYTHONUNBUFFERED: 0
     volumes:
       - codedu_image:/codedu/images
+      - codedu_code:/codedu/codes
     command: ["uvicorn", "look.app:app", "--host", "0", "--proxy-headers"]
   terminal:
     image: ctmanjak/codedu_terminal
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - codedu_code:/codedu/codes
     environment:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
@@ -88,6 +96,7 @@ services:
           - "node.role==manager"
     volumes:
       - codedu_image:/codedu/images
+      - codedu_code:/codedu/codes
     depends_on:
       - falcon
 configs:
