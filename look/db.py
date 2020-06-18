@@ -39,7 +39,7 @@ def init_db():
         sleep(2)
     else:
         print(f"mysql+mysqldb://{Config.DB_USER}{':'+Config.DB_PASSWORD if not Config.DB_PASSWORD=='travis' else ''}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_NAME}?charset=utf8")
-        print(Config.DB_HOST, Config.DB_PORT, Config.DB_USER, Config.DB_PASSWORD, os.environ["DB_PASSWORD"])
+        print(Config.DB_HOST, Config.DB_PORT, Config.DB_USER, Config.DB_PASSWORD, os.getenv("DB_PASSWORD", None))
         print("Can't connect to MySQL server")
         sys.exit(1)
 

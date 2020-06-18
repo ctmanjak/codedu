@@ -1,3 +1,4 @@
+import os
 import time
 import json
 import falcon
@@ -846,7 +847,7 @@ def test_register_with_invalid_username_1(client):
 def test_register_with_invalid_username_2(client):
     doc = {
         "title": "400 Bad Request",
-        "description": "Username can only contain alphanumeric characters and underscore.",
+        "description": "Username can only contain 한글, alphanumeric characters and underscore.",
     }
 
     body = {
@@ -869,3 +870,73 @@ def test_register_with_invalid_username_2(client):
 
     assert result_doc == doc
     assert response.status == falcon.HTTP_400
+
+def test_update_user_image(client):
+    doc = {
+        "updateUserInfo": {
+            "user": {
+                "image": "test/images/user/0000000009.png",
+            }
+        }
+    }
+
+    query = {
+        "query": '''
+            mutation {
+                updateUserInfo(data: {id: 9}) {
+                    user {
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    fake_image_byte = b"b" * (2 * 1024 * 1024)
+    
+    m = MultipartEncoder(
+    fields={'data': ('data', json.dumps(query), 'application/json'),
+            'image': ('a.png', fake_image_byte, 'image/png')}
+    )
+    
+    response = client.simulate_post('/api/graphql', content_type=m.content_type, body=m.to_string(), headers={
+        'Authorization': admin_token
+    })
+
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_OK
+
+    with open(doc['updateUserInfo']['user']['image'], 'rb') as f:
+        assert f.read() == fake_image_byte
+
+def test_delete_user_image(client):
+    doc = {
+        "deleteAccount": {
+            "user": {
+                "image": "test/images/user/0000000009.png",
+            }
+        }
+    }
+
+    body = {
+        "query": '''
+            mutation {
+                deleteAccount(data: {id: 9}) {
+                    user {
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    
+    response = client.simulate_post('/api/graphql', content_type='application/json', body=json.dumps(body), headers={
+        'Authorization': admin_token
+    })
+    result_doc = json.loads(response.content.decode())
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_OK
+
+    assert not os.path.exists(doc['deleteAccount']['user']['image'])

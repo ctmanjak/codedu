@@ -1,4 +1,5 @@
-import json, time
+import os
+import json
 import falcon
 import hmac
 from hashlib import sha256
@@ -409,3 +410,72 @@ def test_create_post_with_valid_image(client):
     with open(doc['createPost']['post']['image'], 'rb') as f:
         assert f.read() == fake_image_byte
 
+def test_update_post_image(client):
+    doc = {
+        "updatePost": {
+            "post": {
+                "image": "test/images/post/0000000006.png",
+            }
+        }
+    }
+
+    query = {
+        "query": '''
+            mutation {
+                updatePost(data: {id: 6}) {
+                    post {
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    fake_image_byte = b"b" * (2 * 1024 * 1024)
+    
+    m = MultipartEncoder(
+    fields={'data': ('data', json.dumps(query), 'application/json'),
+            'image': ('b.png', fake_image_byte, 'image/png')}
+    )
+    
+    response = client.simulate_post('/api/graphql', content_type=m.content_type, body=m.to_string(), headers={
+        'Authorization': admin_token
+    })
+
+    result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_OK
+
+    with open(doc['updatePost']['post']['image'], 'rb') as f:
+        assert f.read() == fake_image_byte
+
+def test_delete_post_image(client):
+    doc = {
+        "deletePost": {
+            "post": {
+                "image": "test/images/post/0000000006.png",
+            }
+        }
+    }
+
+    body = {
+        "query": '''
+            mutation {
+                deletePost(data: {id: 6}) {
+                    post {
+                        image
+                    }
+                }
+            }
+        '''
+    }
+    
+    response = client.simulate_post('/api/graphql', content_type='application/json', body=json.dumps(body), headers={
+        'Authorization': admin_token
+    })
+    result_doc = json.loads(response.content.decode())
+
+    assert result_doc == doc
+    assert response.status == falcon.HTTP_OK
+
+    assert not os.path.exists(doc['deletePost']['post']['image'])

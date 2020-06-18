@@ -10,13 +10,13 @@ class User(Base):
     __tablename__ = 'user'
 
     id = Column(INTEGER(unsigned=True), primary_key=True)
-    username = Column(VARCHAR(32), nullable=False, unique=True)
-    email = Column(VARCHAR(255), nullable=False)
+    username = Column(VARCHAR(32), nullable=False)
+    email = Column(VARCHAR(255, charset="utf8"), nullable=False, unique=True)
     password = Column(VARCHAR(64), nullable=False)
     password_modified = Column(DATETIME, nullable=False, default=datetime.datetime.utcnow())
     admin = Column(BOOLEAN, nullable=False, default=False)
     exp = Column(INTEGER(unsigned=True), nullable=False, default=0)
-    image = Column(VARCHAR(128))
+    image = Column(VARCHAR(64))
 
     learning_progress = relationship("Subchapter", backref="users", secondary="learning_progress", cascade="all, delete")
 

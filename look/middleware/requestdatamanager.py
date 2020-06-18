@@ -8,8 +8,8 @@ from look.exc.handler import CodeduExceptionHandler
 from falcon import HTTPBadRequest
 
 if "pytest" in sys.modules:
-    image_path = 'test/images/'
-else: image_path = 'images/'
+    root_path = 'test'
+else: root_path = '.'
 
 class RequetDataManager(object):
         allowed_image = ['image/png', 'image/jpeg']
@@ -45,6 +45,7 @@ class RequetDataManager(object):
                                         image_info['data'] = part.data
                                         image_info['size'] = len(image_info['data'])
                                         if image_info['size'] <= 2097152:
+                                            image_path = f"{root_path}/images"
                                             image_info["name"] = f"tmp_{sha256(part.filename.encode()).hexdigest()}"
                                             image_info["ext"] = f".{part.filename.split('.')[-1]}"
                                             image_info["dir"] = f"{image_path}/tmp/"
