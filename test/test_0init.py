@@ -20,6 +20,8 @@ def test_root_page(client):
     assert response.status == falcon.HTTP_OK
 
 def test_init_db(client):
-    response = client.simulate_put('/test/db')
+    response = client.simulate_delete('/test/db')
+    response2 = client.simulate_get('/test/db')
 
     assert response.status == falcon.HTTP_OK
+    assert response2.status == falcon.HTTP_OK

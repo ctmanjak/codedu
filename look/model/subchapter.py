@@ -9,6 +9,7 @@ class Subchapter(Base):
 
     id = Column(INTEGER(unsigned=True), primary_key=True)
     title = Column(VARCHAR(32), nullable=False)
+    content_path = Column(VARCHAR(64))
 
     chapter_id = Column(INTEGER(unsigned=True), ForeignKey("chapter.id"))
     chapter = relationship('Chapter', backref=backref('subchapters', order_by=id, cascade="all, delete"), cascade="all, delete")

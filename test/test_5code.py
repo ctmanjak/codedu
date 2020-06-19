@@ -1,13 +1,10 @@
 import os
 import json
+import subprocess
 import falcon
-import hmac
-from hashlib import sha256
 from cerberus import Validator
-from requests_toolbelt import MultipartEncoder
 
 from look.app import app
-from look.config import Config
 
 from . import client, my_token, others_token, admin_token
 
@@ -41,28 +38,28 @@ def test_create_code_without_token(client):
     assert response.status == falcon.HTTP_401
 
 def test_create_code_with_token(client):
-    doc = {
-        "CreateCode1": {
-            "code": {
-                "title": "pytest_code-1",
-                "lang": "python3",
-                "path": "codes/python3/0000000001/main.py",
-            }
-        },
-        "CreateCode2": {
-            "code": {
-                "title": "pytest_code-2",
-                "lang": "python3",
-                "path": "codes/python3/0000000002/main.py",
-            }
-        },
-        "CreateCode3": {
-            "code": {
-                "title": "pytest_code-3",
-                "lang": "python3",
-                "path": "codes/python3/0000000003/main.py",
-            }
-        },
+    schema = {
+        "CreateCode1": { "type": "dict", "schema": {
+            "code": { "type": "dict", "schema": {
+                "title": { "type": "string", "allowed": ["pytest_code-1"]},
+                "lang": { "type": "string", "allowed": ["python3"]},
+                "path": { "type": "string" , "regex": "^codes/python3/[A-Za-z0-9]{12}/main.py$"},
+            }}
+        }},
+        "CreateCode2": { "type": "dict", "schema": {
+            "code": { "type": "dict", "schema": {
+                "title": { "type": "string", "allowed": ["pytest_code-2"]},
+                "lang": { "type": "string", "allowed": ["python3"]},
+                "path": { "type": "string" , "regex": "^codes/python3/[A-Za-z0-9]{12}/main.py$"},
+            }}
+        }},
+        "CreateCode3": { "type": "dict", "schema": {
+            "code": { "type": "dict", "schema": {
+                "title": { "type": "string", "allowed": ["pytest_code-3"]},
+                "lang": { "type": "string", "allowed": ["python3"]},
+                "path": { "type": "string" , "regex": "^codes/python3/[A-Za-z0-9]{12}/main.py$"},
+            }}
+        }},
     }
 
     body = {
@@ -103,10 +100,10 @@ def test_create_code_with_token(client):
     })
     result_doc = json.loads(response.content.decode())
 
-    assert result_doc == doc
+    assert v.validate(result_doc, schema)
     assert response.status == falcon.HTTP_OK
 
-    with open(f"test/{doc['CreateCode1']['code']['path']}", 'rb') as code1, open(f"test/{doc['CreateCode2']['code']['path']}", 'rb') as code2, open(f"test/{doc['CreateCode3']['code']['path']}", 'rb') as code3:
+    with open(f"test/{result_doc['CreateCode1']['code']['path']}", 'rb') as code1, open(f"test/{result_doc['CreateCode2']['code']['path']}", 'rb') as code2, open(f"test/{result_doc['CreateCode3']['code']['path']}", 'rb') as code3:
         assert code1.read().decode() == body['variables']['code1']
         assert code2.read().decode() == body['variables']['code2']
         assert code3.read().decode() == body['variables']['code3']
@@ -162,13 +159,13 @@ def test_update_code_with_invalid_token(client):
     assert response.status == falcon.HTTP_401
 
 def test_update_post_with_valid_token(client):
-    doc = {
-        "updateCode": {
-            "code": {
-                "title": "pytest_updatedcode-1",
-                "path": "codes/python3/0000000002/main.py",
-            }
-        }
+    schema = {
+        "updateCode": { "type": "dict", "schema": {
+            "code": { "type": "dict", "schema": {
+                "title": { "type": "string", "allowed": ["pytest_updatedcode-1"]},
+                "path": { "type": "string" , "regex": "^codes/python3/[A-Za-z0-9]{12}/main.py$"},
+            }}
+        }}
     }
 
     body = {
@@ -192,10 +189,10 @@ def test_update_post_with_valid_token(client):
     })
     result_doc = json.loads(response.content.decode())
 
-    assert result_doc == doc
+    assert v.validate(result_doc, schema)
     assert response.status == falcon.HTTP_OK
 
-    with open(f"test/{doc['updateCode']['code']['path']}", 'rb') as f:
+    with open(f"test/{result_doc['updateCode']['code']['path']}", 'rb') as f:
         assert f.read().decode() == body['variables']['code']
 
 def test_delete_code_without_token(client):
@@ -249,13 +246,13 @@ def test_delete_code_with_invalid_token(client):
     assert response.status == falcon.HTTP_401
 
 def test_delete_code_with_valid_token(client):
-    doc = {
-        "deleteCode": {
-            "code": {
-                "title": "pytest_code-3",
-                "path": "codes/python3/0000000003/main.py",
-            }
-        }
+    schema = {
+        "deleteCode": { "type": "dict", "schema": {
+            "code": { "type": "dict", "schema": {
+                "title": { "type": "string", "allowed": ["pytest_code-3"]},
+                "path": { "type": "string" , "regex": "^codes/python3/[A-Za-z0-9]{12}/main.py$"},
+            }}
+        }}
     }
 
     body = {
@@ -276,19 +273,19 @@ def test_delete_code_with_valid_token(client):
     })
     result_doc = json.loads(response.content.decode())
 
-    assert result_doc == doc
+    assert v.validate(result_doc, schema)
     assert response.status == falcon.HTTP_OK
 
-    assert not os.path.exists(f"test/{doc['deleteCode']['code']['path']}")
+    assert not os.path.exists(f"test/{result_doc['deleteCode']['code']['path']}")
 
 def test_update_code_by_admin(client):
-    doc = {
-        "updateCode": {
-            "code": {
-                "title": "pytest_updatedbyadmin-1",
-                "path": "codes/python3/0000000002/main.py"
-            }
-        }
+    schema = {
+        "updateCode": { "type": "dict", "schema": {
+            "code": { "type": "dict", "schema": {
+                "title": { "type": "string", "allowed": ["pytest_updatedbyadmin-1"]},
+                "path": { "type": "string" , "regex": "^codes/python3/[A-Za-z0-9]{12}/main.py$"},
+            }}
+        }}
     }
 
     body = {
@@ -312,20 +309,20 @@ def test_update_code_by_admin(client):
     })
     result_doc = json.loads(response.content.decode())
 
-    assert result_doc == doc
+    assert v.validate(result_doc, schema)
     assert response.status == falcon.HTTP_OK
 
-    with open(f"test/{doc['updateCode']['code']['path']}", 'rb') as f:
+    with open(f"test/{result_doc['updateCode']['code']['path']}", 'rb') as f:
         assert f.read().decode() == body['variables']['code']
 
 def test_delete_code_by_admin(client):
-    doc = {
-        "deleteCode": {
-            "code": {
-                "title": "pytest_updatedbyadmin-1",
-                "path": "codes/python3/0000000002/main.py",
-            }
-        }
+    schema = {
+        "deleteCode": { "type": "dict", "schema": {
+            "code": { "type": "dict", "schema": {
+                "title": { "type": "string", "allowed": ["pytest_updatedbyadmin-1"]},
+                "path": { "type": "string" , "regex": "^codes/python3/[A-Za-z0-9]{12}/main.py$"},
+            }}
+        }}
     }
 
     body = {
@@ -346,7 +343,104 @@ def test_delete_code_by_admin(client):
     })
     result_doc = json.loads(response.content.decode())
 
-    assert result_doc == doc
+    assert v.validate(result_doc, schema)
     assert response.status == falcon.HTTP_OK
 
-    assert not os.path.exists(f"test/{doc['deleteCode']['code']['path']}")
+    assert not os.path.exists(f"test/{result_doc['deleteCode']['code']['path']}")
+
+def test_python3_is_runnable(client):
+    schema = {
+        "createCode": { "type": "dict", "schema": {
+            "code": { "type": "dict", "schema": {
+                "title": { "type": "string", "allowed": ["pytest_code-4"]},
+                "lang": { "type": "string", "allowed": ["python3"]},
+                "path": { "type": "string" , "regex": "^codes/python3/[A-Za-z0-9]{12}/main.py$"},
+            }}
+        }}
+    }
+
+    body = {
+        "query": '''
+            mutation ($code:String!) {
+                createCode(data: {title:"pytest_code-4", lang:"python3", code:$code}) {
+                    code {
+                        title
+                        lang
+                        path
+                    }
+                }
+            }
+        ''',
+        "variables": {
+            "code": '''
+import json
+data = {
+    "hi": "hello",
+}
+print(json.dumps(data))
+            ''',
+        }
+    }
+
+    response = client.simulate_post('/api/graphql', content_type='application/json', body=json.dumps(body), headers={
+        "Authorization": my_token,
+    })
+    result_doc = json.loads(response.content.decode())
+
+    assert v.validate(result_doc, schema)
+    assert response.status == falcon.HTTP_OK
+
+    run = {
+        "hi": "hello",
+    }
+
+    result_run = subprocess.run(["python3", f"test/{result_doc['createCode']['code']['path']}"], stdout=subprocess.PIPE)
+    assert result_run.stdout.decode() == f"{json.dumps(run)}\n"
+
+def test_clang_is_runnable(client):
+    schema = {
+        "createCode": { "type": "dict", "schema": {
+            "code": { "type": "dict", "schema": {
+                "title": { "type": "string", "allowed": ["pytest_code-5"]},
+                "lang": { "type": "string", "allowed": ["clang"]},
+                "path": { "type": "string" , "regex": "^codes/clang/[A-Za-z0-9]{12}/main.c$"},
+            }}
+        }}
+    }
+
+    body = {
+        "query": '''
+            mutation ($code:String!) {
+                createCode(data: {title:"pytest_code-5", lang:"clang", code:$code}) {
+                    code {
+                        title
+                        lang
+                        path
+                    }
+                }
+            }
+        ''',
+        "variables": {
+            "code": '''
+                #include <stdio.h>
+
+                int main() {
+                    printf("%d", 133);
+                }
+            ''',
+        }
+    }
+
+    response = client.simulate_post('/api/graphql', content_type='application/json', body=json.dumps(body), headers={
+        "Authorization": my_token,
+    })
+    result_doc = json.loads(response.content.decode())
+
+    assert v.validate(result_doc, schema)
+    assert response.status == falcon.HTTP_OK
+
+    path = '/'.join(result_doc['createCode']['code']['path'].split('/')[:-1])
+    compile_proc = subprocess.run(["gcc", "-o", f"test/{path}/main", f"test/{result_doc['createCode']['code']['path']}"])
+    result_run = subprocess.run([f"test/{path}/main"], shell=True, stdout=subprocess.PIPE)
+    
+    assert result_run.stdout.decode() == "133"

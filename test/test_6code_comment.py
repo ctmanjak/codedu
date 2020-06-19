@@ -5,7 +5,7 @@ from look.app import app
 
 from . import client, my_token, others_token, admin_token
 
-def test_create_post_comment_without_token(client):
+def test_create_code_comment_without_token(client):
     doc = {
         "title": "401 Unauthorized",
         "description": "토큰이 없는뎁쇼",
@@ -14,8 +14,8 @@ def test_create_post_comment_without_token(client):
     body = {
         "query": '''
             mutation {
-                createPostComment(data: {postId: 1, content:"pytest_post_comment_comment-1"}) {
-                    postComment {
+                createCodeComment(data: {codeId: 1, content:"pytest_code_comment_comment-1"}) {
+                    codeComment {
                         content
                     }
                 }
@@ -29,21 +29,21 @@ def test_create_post_comment_without_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_401
 
-def test_create_post_comment_with_token(client):
+def test_create_code_comment_with_token(client):
     doc = {
-        "CreatePostComment": {
-            "postComment": {
-                "content": "pytest_post_comment-1",
+        "createCodeComment": {
+            "codeComment": {
+                "content": "pytest_code_comment-1",
             }
         },
-        "CreatePostComment2": {
-            "postComment": {
-                "content": "pytest_post_comment-2",
+        "createCodeComment2": {
+            "codeComment": {
+                "content": "pytest_code_comment-2",
             }
         },
-        "CreatePostComment3": {
-            "postComment": {
-                "content": "pytest_post_comment-3",
+        "createCodeComment3": {
+            "codeComment": {
+                "content": "pytest_code_comment-3",
             }
         },
     }
@@ -51,18 +51,18 @@ def test_create_post_comment_with_token(client):
     body = {
         "query": '''
             mutation {
-                CreatePostComment: createPostComment(data: {postId: 1, content:"pytest_post_comment-1"}) {
-                    postComment {
+                createCodeComment: createCodeComment(data: {codeId: 1, content:"pytest_code_comment-1"}) {
+                    codeComment {
                         content
                     }
                 }
-                CreatePostComment2: createPostComment(data: {postId: 1, content:"pytest_post_comment-2"}) {
-                    postComment {
+                createCodeComment2: createCodeComment(data: {codeId: 1, content:"pytest_code_comment-2"}) {
+                    codeComment {
                         content
                     }
                 }
-                CreatePostComment3: createPostComment(data: {postId: 1, content:"pytest_post_comment-3"}) {
-                    postComment {
+                createCodeComment3: createCodeComment(data: {codeId: 1, content:"pytest_code_comment-3"}) {
+                    codeComment {
                         content
                     }
                 }
@@ -78,7 +78,7 @@ def test_create_post_comment_with_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-def test_update_post_comment_comment_without_token(client):
+def test_update_code_comment_comment_without_token(client):
     doc = {
         "title": "401 Unauthorized",
         "description": "토큰이 없는뎁쇼",
@@ -87,8 +87,8 @@ def test_update_post_comment_comment_without_token(client):
     body = {
         "query": '''
             mutation {
-                updatePostComment(data: {id: 3, content:"pytest_updatedpost_comment-1"}) {
-                    postComment {
+                updateCodeComment(data: {id: 3, content:"pytest_updatedcode_comment-1"}) {
+                    codeComment {
                         content
                     }
                 }
@@ -102,7 +102,7 @@ def test_update_post_comment_comment_without_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_401
 
-def test_update_post_comment_with_invalid_token(client):
+def test_update_code_comment_with_invalid_token(client):
     doc = {
         "title": "401 Unauthorized",
         "description": "PERMISSION DENIED",
@@ -111,8 +111,8 @@ def test_update_post_comment_with_invalid_token(client):
     body = {
         "query": '''
             mutation {
-                updatePostComment(data: {id: 3, content:"pytest_updatedpost_comment-1"}) {
-                    postComment {
+                updateCodeComment(data: {id: 3, content:"pytest_updatedcode_comment-1"}) {
+                    codeComment {
                         content
                     }
                 }
@@ -128,11 +128,11 @@ def test_update_post_comment_with_invalid_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_401
 
-def test_update_post_comment_with_valid_token(client):
+def test_update_code_comment_with_valid_token(client):
     doc = {
-        "updatePostComment": {
-            "postComment": {
-                "content": "pytest_updatedpost_comment-1"
+        "updateCodeComment": {
+            "codeComment": {
+                "content": "pytest_updatedcode_comment-1"
             }
         }
     }
@@ -140,8 +140,8 @@ def test_update_post_comment_with_valid_token(client):
     body = {
         "query": '''
             mutation {
-                updatePostComment(data: {id: 3, content:"pytest_updatedpost_comment-1"}) {
-                    postComment {
+                updateCodeComment(data: {id: 3, content:"pytest_updatedcode_comment-1"}) {
+                    codeComment {
                         content
                     }
                 }
@@ -157,7 +157,7 @@ def test_update_post_comment_with_valid_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-def test_delete_post_comment_without_token(client):
+def test_delete_code_comment_without_token(client):
     doc = {
         "title": "401 Unauthorized",
         "description": "토큰이 없는뎁쇼",
@@ -166,8 +166,8 @@ def test_delete_post_comment_without_token(client):
     body = {
         "query": '''
             mutation {
-                deletePostComment(data: {id: 3}) {
-                    postComment {
+                deleteCodeComment(data: {id: 3}) {
+                    codeComment {
                         content
                     }
                 }
@@ -181,7 +181,7 @@ def test_delete_post_comment_without_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_401
 
-def test_delete_post_comment_with_invalid_token(client):
+def test_delete_code_comment_with_invalid_token(client):
     doc = {
         "title": "401 Unauthorized",
         "description": "PERMISSION DENIED",
@@ -190,8 +190,8 @@ def test_delete_post_comment_with_invalid_token(client):
     body = {
         "query": '''
             mutation {
-                deletePostComment(data: {id: 3}) {
-                    postComment {
+                deleteCodeComment(data: {id: 3}) {
+                    codeComment {
                         content
                     }
                 }
@@ -207,11 +207,11 @@ def test_delete_post_comment_with_invalid_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_401
 
-def test_delete_post_comment_with_valid_token(client):
+def test_delete_code_comment_with_valid_token(client):
     doc = {
-        "deletePostComment": {
-            "postComment": {
-                "content": "pytest_updatedpost_comment-1"
+        "deleteCodeComment": {
+            "codeComment": {
+                "content": "pytest_updatedcode_comment-1"
             }
         }
     }
@@ -219,8 +219,8 @@ def test_delete_post_comment_with_valid_token(client):
     body = {
         "query": '''
             mutation {
-                deletePostComment(data: {id: 3}) {
-                    postComment {
+                deleteCodeComment(data: {id: 3}) {
+                    codeComment {
                         content
                     }
                 }
@@ -236,10 +236,10 @@ def test_delete_post_comment_with_valid_token(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-def test_update_post_comment_by_admin(client):
+def test_update_code_comment_by_admin(client):
     doc = {
-        "updatePostComment": {
-            "postComment": {
+        "updateCodeComment": {
+            "codeComment": {
                 "content": "pytest_updatedbyadmin-1"
             }
         }
@@ -248,8 +248,8 @@ def test_update_post_comment_by_admin(client):
     body = {
         "query": '''
             mutation {
-                updatePostComment(data: {id: 2, content:"pytest_updatedbyadmin-1"}) {
-                    postComment {
+                updateCodeComment(data: {id: 2, content:"pytest_updatedbyadmin-1"}) {
+                    codeComment {
                         content
                     }
                 }
@@ -265,10 +265,10 @@ def test_update_post_comment_by_admin(client):
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
 
-def test_delete_post_comment_by_admin(client):
+def test_delete_code_comment_by_admin(client):
     doc = {
-        "deletePostComment": {
-            "postComment": {
+        "deleteCodeComment": {
+            "codeComment": {
                 "content": "pytest_updatedbyadmin-1"
             }
         }
@@ -277,8 +277,8 @@ def test_delete_post_comment_by_admin(client):
     body = {
         "query": '''
             mutation {
-                deletePostComment(data: {id: 2}) {
-                    postComment {
+                deleteCodeComment(data: {id: 2}) {
+                    codeComment {
                         content
                     }
                 }

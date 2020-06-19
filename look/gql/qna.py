@@ -6,63 +6,72 @@ from falcon import HTTPUnauthorized
 
 from . import gql_models
 from .util import create_input_class, create_mutation_field, get_instance_by_pk, check_row_by_user_id, \
-    db_session_flush, image_handle, code_handle, simple_create_mutate, simple_update_mutate, simple_delete_mutate
+    db_session_flush, image_handle
 
-def create_code_schema():
-    def create_code_mutate(cls, info, model=None, **kwargs):
+def create_question_schema():
+    def create_question_mutate(cls, info, model=None, **kwargs):
         if info.context['auth']['data']:
             model = model._meta.model
             data = kwargs.get('data', None)
             if data:
+                tags = data.get('tags', None)
+                if tags:
+                    del data['tags']
                 data['user_id'] = info.context['auth']['data']['user_id']
-                code = data['code']
-                del data['code']
                 db_session = info.context.get('session', None)
                 if db_session:
                     instance = model(**data)
+                    if tags:
+                        tags = tags.split(" ")
+                        exist_tags = {tag.name:tag for tag in gql_models['tag'].get_query(info).filter(gql_models['tag']._meta.model.name.in_(tags)).all()}
+                        new_tags = [gql_models['tag']._meta.model(name=tag) for tag in tags if not tag in exist_tags.keys()]
+                        db_session.add_all(new_tags)
+                        instance.tags = list(exist_tags.values())+new_tags
                     db_session.add(instance)
                     db_session_flush(db_session)
-                    
-                    if code:
-                        code_handle(instance, code)
 
                 return cls(**{model.__tablename__:instance})
         else:
             raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
 
-    def update_code_mutate(cls, info, model=None, **kwargs):
+    def update_question_mutate(cls, info, model=None, **kwargs):
         if info.context['auth']['data']:
             query = model.get_query(info)
             model = model._meta.model
             data = kwargs.get('data', None)
             if data:
-                code = data.get('code', None)
-                if code:
-                    del data['code']
+                tags = data.get('tags', None)
+                if tags:
+                    del data['tags']
                 instance = get_instance_by_pk(query, model, data)
-
+                
                 if info.context['auth']['data']['admin'] or check_row_by_user_id(info.context['auth']['data']['user_id'], model, instance):
                     instance.update(data)
-                    if code:
-                        code_handle(instance.one(), code)
+                    if tags:
+                        db_session = info.context.get('session', None)
+                        tags = tags.split(" ")
+                        exist_tags = {tag.name:tag for tag in gql_models['tag'].get_query(info).filter(gql_models['tag']._meta.model.name.in_(tags)).all()}
+                        new_tags = [gql_models['tag']._meta.model(name=tag) for tag in tags if not tag in exist_tags.keys()]
+                        db_session.add_all(new_tags)
+                        instance.one().tags = list(exist_tags.values())+new_tags
                     return cls(**{model.__tablename__:instance.one()})
                 else:
                     raise CodeduExceptionHandler(HTTPUnauthorized(description="PERMISSION DENIED"))
         else:
             raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
 
-    def delete_code_mutate(cls, info, model=None, **kwargs):
+    def delete_question_mutate(cls, info, model=None, **kwargs):
         if info.context['auth']['data']:
             query = model.get_query(info)
             model = model._meta.model
             data = kwargs.get('data', None)
             if data:
                 instance = get_instance_by_pk(query, model, data)
-                
+
                 if info.context['auth']['data']['admin'] or check_row_by_user_id(info.context['auth']['data']['user_id'], model, instance):
                     tmp_instance = instance.one()
+                    instance.one().tags = []
                     instance.delete()
-                    code_handle(tmp_instance, None)
                     return cls(**{model.__tablename__:tmp_instance})
                 else:
                     raise CodeduExceptionHandler(HTTPUnauthorized(description="PERMISSION DENIED"))
@@ -72,62 +81,31 @@ def create_code_schema():
     query_field = {}
     mutation_field = {}
 
-    mutation_field["create_code"] = create_mutation_field("CreateCode",
-        gql_models['code'],
-        create_code_mutate,
-        create_input_class('CreateCodeInput', {
+    mutation_field["create_question"] = create_mutation_field("CreateQuestion",
+        gql_models['question'],
+        create_question_mutate,
+        create_input_class('CreateQuestionInput', {
             'title': graphene.String(required=True),
-            'lang': graphene.String(required=True),
-            'code': graphene.String(required=True),
+            'content': graphene.String(required=True),
+            'tags': graphene.String(),
         })
     )
 
-    mutation_field["update_code"] = create_mutation_field("UpdateCode",
-        gql_models['code'],
-        update_code_mutate,
-        create_input_class('UpdateCodeInput', {
+    mutation_field["update_question"] = create_mutation_field("UpdateQuestion",
+        gql_models['question'],
+        update_question_mutate,
+        create_input_class('UpdateQuestionInput', {
             "id": graphene.ID(required=True),
             'title': graphene.String(),
-            'code': graphene.String(),
-        }),
-    )
-
-    mutation_field["delete_code"] = create_mutation_field("DeleteCode",
-        gql_models['code'],
-        delete_code_mutate,
-        create_input_class('DeleteCodeInput', {
-            "id": graphene.ID(required=True)
-        }),
-    )
-
-    return (query_field, mutation_field)
-
-def create_code_comment_schema():
-    query_field = {}
-    mutation_field = {}
-
-    mutation_field["create_code_comment"] = create_mutation_field("CreateCodeComment",
-        gql_models['code_comment'],
-        simple_create_mutate,
-        create_input_class('CreateCodeCommentInput', {
-            'code_id': graphene.ID(required=True),
-            'content': graphene.String(required=True),
-        })
-    )
-
-    mutation_field["update_code_comment"] = create_mutation_field("UpdateCodeComment",
-        gql_models['code_comment'],
-        simple_update_mutate,
-        create_input_class('UpdateCodeCommentInput', {
-            "id": graphene.ID(required=True),
             'content': graphene.String(),
+            'tags': graphene.String(),
         }),
     )
 
-    mutation_field["delete_code_comment"] = create_mutation_field("DeleteCodeComment",
-        gql_models['code_comment'],
-        simple_delete_mutate,
-        create_input_class('DeleteCodeCommentInput', {
+    mutation_field["delete_question"] = create_mutation_field("DeleteQuestion",
+        gql_models['question'],
+        delete_question_mutate,
+        create_input_class('DeleteQuestionInput', {
             "id": graphene.ID(required=True)
         }),
     )

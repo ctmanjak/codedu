@@ -81,7 +81,7 @@ def create_auth_schema():
                     
                 instance = get_instance_by_pk(query, model, data)
                 
-                if info.context['auth']['data']['admin'] or instance.one().password == data['password']:
+                if info.context['auth']['data']['admin'] or (instance.one() and instance.one().password == data['password']):
                     instance.update(data)
                     if image_info:
                         image_handle('user', instance.one(), image_info)

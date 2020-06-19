@@ -238,8 +238,9 @@ def insert_dummy_data(db_session):
             setattr(models[rel][m], relationships[rel]["rel_name"], tmp[m])
 
     for table in models:
-        for model in models[table]:
-            db_session.add(model)
+        db_session.add_all(models[table])
+        # for model in models[table]:
+        #     db_session.add(model)
 
     try:
         db_session.commit()

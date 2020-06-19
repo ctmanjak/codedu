@@ -3,7 +3,7 @@ import graphene
 from look.model import Base
 
 from look.gql import create_gql_models, create_base_schema, create_auth_schema, create_post_schema, create_post_comment_schema, \
-    create_code_schema
+    create_code_schema, create_code_comment_schema, create_question_schema
 
 def init_schema():
     print("init_schema")
@@ -17,6 +17,8 @@ def init_schema():
         create_post_schema,
         create_post_comment_schema,
         create_code_schema,
+        create_code_comment_schema,
+        create_question_schema,
     ]
 
     for schema in schemas:

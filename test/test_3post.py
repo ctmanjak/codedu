@@ -1,13 +1,10 @@
 import os
 import json
 import falcon
-import hmac
-from hashlib import sha256
 from cerberus import Validator
 from requests_toolbelt import MultipartEncoder
 
 from look.app import app
-from look.config import Config
 
 from . import client, my_token, others_token, admin_token
 
@@ -95,7 +92,7 @@ def test_update_post_without_token(client):
     body = {
         "query": '''
             mutation {
-                updatePost(data: {id: 5, content:"pytest_updatedpost-1"}) {
+                updatePost(data: {id: 2, content:"pytest_updatedpost-1"}) {
                     post {
                         content
                     }
@@ -119,7 +116,7 @@ def test_update_post_with_invalid_token(client):
     body = {
         "query": '''
             mutation {
-                updatePost(data: {id: 5, content:"pytest_updatedpost-1"}) {
+                updatePost(data: {id: 2, content:"pytest_updatedpost-1"}) {
                     post {
                         content
                     }
@@ -148,7 +145,7 @@ def test_update_post_with_valid_token(client):
     body = {
         "query": '''
             mutation {
-                updatePost(data: {id: 5, content:"pytest_updatedpost-1"}) {
+                updatePost(data: {id: 2, content:"pytest_updatedpost-1"}) {
                     post {
                         content
                     }
@@ -174,7 +171,7 @@ def test_delete_post_without_token(client):
     body = {
         "query": '''
             mutation {
-                deletePost(data: {id: 5}) {
+                deletePost(data: {id: 2}) {
                     post {
                         content
                     }
@@ -198,7 +195,7 @@ def test_delete_post_with_invalid_token(client):
     body = {
         "query": '''
             mutation {
-                deletePost(data: {id: 5}) {
+                deletePost(data: {id: 2}) {
                     post {
                         content
                     }
@@ -227,7 +224,7 @@ def test_delete_post_with_valid_token(client):
     body = {
         "query": '''
             mutation {
-                deletePost(data: {id: 5}) {
+                deletePost(data: {id: 2}) {
                     post {
                         content
                     }
@@ -256,7 +253,7 @@ def test_update_post_by_admin(client):
     body = {
         "query": '''
             mutation {
-                updatePost(data: {id: 4, content:"pytest_updatedbyadmin-1"}) {
+                updatePost(data: {id: 3, content:"pytest_updatedbyadmin-1"}) {
                     post {
                         content
                     }
@@ -285,7 +282,7 @@ def test_delete_post_by_admin(client):
     body = {
         "query": '''
             mutation {
-                deletePost(data: {id: 4}) {
+                deletePost(data: {id: 3}) {
                     post {
                         content
                     }
@@ -370,13 +367,13 @@ def test_create_post_with_larger_than_2mb_image(client):
     assert response.status == falcon.HTTP_400
 
 def test_create_post_with_valid_image(client):
-    doc = {
-        "createPost": {
-            "post": {
-                "content": "imagetest_post-1",
-                "image": "images/post/0000000006.png",
-            }
-        },
+    schema = {
+        "createPost": { "type": "dict", "schema": {
+            "post": { "type": "dict", "schema": {
+                "content": { "type": "string", "allowed": ["imagetest_post-1"]},
+                "image": { "type": "string" , "regex": "^images/post/[A-Za-z0-9]{12}.(png|jpg)$"},
+            }}
+        }}
     }
 
     query = {
@@ -404,25 +401,25 @@ def test_create_post_with_valid_image(client):
 
     result_doc = json.loads(response.content.decode())
 
-    assert result_doc == doc
+    assert v.validate(result_doc, schema)
     assert response.status == falcon.HTTP_OK
 
-    with open(f"test/{doc['createPost']['post']['image']}", 'rb') as f:
+    with open(f"test/{result_doc['createPost']['post']['image']}", 'rb') as f:
         assert f.read() == fake_image_byte
 
 def test_update_post_image(client):
-    doc = {
-        "updatePost": {
-            "post": {
-                "image": "images/post/0000000006.png",
-            }
-        }
+    schema = {
+        "updatePost": { "type": "dict", "schema": {
+            "post": { "type": "dict", "schema": {
+                "image": { "type": "string" , "regex": "^images/post/[A-Za-z0-9]{12}.(png|jpg)$"},
+            }}
+        }}
     }
 
     query = {
         "query": '''
             mutation {
-                updatePost(data: {id: 6}) {
+                updatePost(data: {id: 4}) {
                     post {
                         image
                     }
@@ -443,25 +440,25 @@ def test_update_post_image(client):
 
     result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
 
-    assert result_doc == doc
+    assert v.validate(result_doc, schema)
     assert response.status == falcon.HTTP_OK
 
-    with open(f"test/{doc['updatePost']['post']['image']}", 'rb') as f:
+    with open(f"test/{result_doc['updatePost']['post']['image']}", 'rb') as f:
         assert f.read() == fake_image_byte
 
 def test_delete_post_image(client):
-    doc = {
-        "deletePost": {
-            "post": {
-                "image": "images/post/0000000006.png",
-            }
-        }
+    schema = {
+        "deletePost": { "type": "dict", "schema": {
+            "post": { "type": "dict", "schema": {
+                "image": { "type": "string" , "regex": "^images/post/[A-Za-z0-9]{12}.(png|jpg)$"},
+            }}
+        }}
     }
 
     body = {
         "query": '''
             mutation {
-                deletePost(data: {id: 6}) {
+                deletePost(data: {id: 4}) {
                     post {
                         image
                     }
@@ -475,7 +472,7 @@ def test_delete_post_image(client):
     })
     result_doc = json.loads(response.content.decode())
 
-    assert result_doc == doc
+    assert v.validate(result_doc, schema)
     assert response.status == falcon.HTTP_OK
 
-    assert not os.path.exists(f"test/{doc['deletePost']['post']['image']}")
+    assert not os.path.exists(f"test/{result_doc['deletePost']['post']['image']}")

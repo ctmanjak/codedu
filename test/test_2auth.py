@@ -1,5 +1,4 @@
 import os
-import time
 import json
 import falcon
 import hmac
@@ -29,7 +28,21 @@ def test_register(client):
                 "username": "pytestuser2",
                 "password": hmac.new(Config.SECRET_KEY.encode(), "pytestuser2123!".encode(), sha256).hexdigest(),
             }
-        }
+        },
+        "Register3": {
+            "user": {
+                "email": "pytestuser3@email.com",
+                "username": "pytestuser3",
+                "password": hmac.new(Config.SECRET_KEY.encode(), "pytestuser3123!".encode(), sha256).hexdigest(),
+            }
+        },
+        "Register4": {
+            "user": {
+                "email": "pytestuser4@email.com",
+                "username": "pytestuser4",
+                "password": hmac.new(Config.SECRET_KEY.encode(), "pytestuser4123!".encode(), sha256).hexdigest(),
+            }
+        },
     }
 
     body = {
@@ -43,6 +56,20 @@ def test_register(client):
                     }
                 }
                 Register2: register(data: {username:"pytestuser2", email:"pytestuser2@email.com", password:"pytestuser2123!"}) {
+                    user {
+                        email
+                        username
+                        password
+                    }
+                }
+                Register3: register(data: {username:"pytestuser3", email:"pytestuser3@email.com", password:"pytestuser3123!"}) {
+                    user {
+                        email
+                        username
+                        password
+                    }
+                }
+                Register4: register(data: {username:"pytestuser4", email:"pytestuser4@email.com", password:"pytestuser4123!"}) {
                     user {
                         email
                         username
@@ -142,7 +169,7 @@ def test_update_user_without_token(client):
     body = {
         "query": '''
             mutation {
-                updateUserInfo(data: {username:"updateduser", password:"pytestuser2123!"}) {
+                updateUserInfo(data: {username:"updateduser", password:"pytestuser4123!"}) {
                     user {
                         email
                         username
@@ -397,9 +424,9 @@ def test_update_user_by_admin(client):
     doc = {
         "updateUserInfo": {
             "user": {
-                "email": "pytestuser2@email.com",
+                "email": "pytestuser4@email.com",
                 "username": "updatedbyadmin",
-                "password": hmac.new(Config.SECRET_KEY.encode(), "pytestuser2123!".encode(), sha256).hexdigest(),
+                "password": hmac.new(Config.SECRET_KEY.encode(), "pytestuser4123!".encode(), sha256).hexdigest(),
             }
         }
     }
@@ -407,7 +434,7 @@ def test_update_user_by_admin(client):
     body = {
         "query": '''
             mutation {
-                updateUserInfo(data: {id: 8, username:"updatedbyadmin", password:"updatedbyadmin123!"}) {
+                updateUserInfo(data: {id: 4, username:"updatedbyadmin", password:"updatedbyadmin123!"}) {
                     user {
                         email
                         username
@@ -430,7 +457,7 @@ def test_update_password_by_admin(client):
     doc = {
         "updatePassword": {
             "user": {
-                "email": "pytestuser2@email.com",
+                "email": "pytestuser4@email.com",
                 "username": "updatedbyadmin",
                 "password": hmac.new(Config.SECRET_KEY.encode(), "updatedbyadmin123!".encode(), sha256).hexdigest(),
             }
@@ -440,7 +467,7 @@ def test_update_password_by_admin(client):
     body = {
         "query": '''
             mutation {
-                updatePassword(data: {id: 8, newPassword:"updatedbyadmin123!"}) {
+                updatePassword(data: {id: 4, newPassword:"updatedbyadmin123!"}) {
                     user {
                         email
                         username
@@ -463,7 +490,7 @@ def test_delete_account_by_admin(client):
     doc = {
         "deleteAccount": {
             "user": {
-                "email": "pytestuser2@email.com",
+                "email": "pytestuser4@email.com",
                 "username": "updatedbyadmin",
                 "password": hmac.new(Config.SECRET_KEY.encode(), "updatedbyadmin123!".encode(), sha256).hexdigest(),
             }
@@ -473,7 +500,7 @@ def test_delete_account_by_admin(client):
     body = {
         "query": '''
             mutation {
-                deleteAccount(data: {id: 8}) {
+                deleteAccount(data: {id: 4}) {
                     user {
                         email
                         username
@@ -559,15 +586,15 @@ def test_register_with_larger_than_2mb_image(client):
     assert response.status == falcon.HTTP_400
 
 def test_register_with_valid_image(client):
-    doc = {
-        "register": {
-            "user": {
-                "email": "imagetestuser@email.com",
-                "username": "imagetestuser",
-                "password": hmac.new(Config.SECRET_KEY.encode(), "imagetestuser123!".encode(), sha256).hexdigest(),
-                "image": "images/user/0000000009.png"
-            }
-        }
+    schema = {
+        "register": { "type": "dict", "schema": {
+            "user": { "type": "dict", "schema": {
+                "email": { "type": "string", "allowed": ["imagetestuser@email.com"]},
+                "username": { "type": "string", "allowed": ["imagetestuser"]},
+                "password": { "type": "string", "allowed": [hmac.new(Config.SECRET_KEY.encode(), "imagetestuser123!".encode(), sha256).hexdigest()]},
+                "image": { "type": "string" , "regex": "^images/user/[A-Za-z0-9]{12}.(png|jpg)$"},
+            }}
+        }}
     }
 
     query = {
@@ -595,10 +622,10 @@ def test_register_with_valid_image(client):
 
     result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
 
-    assert result_doc == doc
+    assert v.validate(result_doc, schema)
     assert response.status == falcon.HTTP_OK
 
-    with open(f"test/{doc['register']['user']['image']}", 'rb') as f:
+    with open(f"test/{result_doc['register']['user']['image']}", 'rb') as f:
         assert f.read() == fake_image_byte
 
 def test_register_with_invalid_email_1(client):
@@ -872,18 +899,18 @@ def test_register_with_invalid_username_2(client):
     assert response.status == falcon.HTTP_400
 
 def test_update_user_image(client):
-    doc = {
-        "updateUserInfo": {
-            "user": {
-                "image": "images/user/0000000009.png",
-            }
-        }
+    schema = {
+        "updateUserInfo": { "type": "dict", "schema": {
+            "user": { "type": "dict", "schema": {
+                "image": { "type": "string" , "regex": "^images/user/[A-Za-z0-9]{12}.(png|jpg)$"},
+            }}
+        }}
     }
 
     query = {
         "query": '''
             mutation {
-                updateUserInfo(data: {id: 9}) {
+                updateUserInfo(data: {id: 5}) {
                     user {
                         image
                     }
@@ -904,25 +931,25 @@ def test_update_user_image(client):
 
     result_doc = json.loads(response.content.decode() if type(response.content) == bytes else response)
 
-    assert result_doc == doc
+    assert v.validate(result_doc, schema)
     assert response.status == falcon.HTTP_OK
 
-    with open(f"test/{doc['updateUserInfo']['user']['image']}", 'rb') as f:
+    with open(f"test/{result_doc['updateUserInfo']['user']['image']}", 'rb') as f:
         assert f.read() == fake_image_byte
 
 def test_delete_user_image(client):
-    doc = {
-        "deleteAccount": {
-            "user": {
-                "image": "images/user/0000000009.png",
-            }
-        }
+    schema = {
+        "deleteAccount": { "type": "dict", "schema": {
+            "user": { "type": "dict", "schema": {
+                "image": { "type": "string" , "regex": "^images/user/[A-Za-z0-9]{12}.(png|jpg)$"},
+            }}
+        }}
     }
 
     body = {
         "query": '''
             mutation {
-                deleteAccount(data: {id: 9}) {
+                deleteAccount(data: {id: 5}) {
                     user {
                         image
                     }
@@ -936,7 +963,7 @@ def test_delete_user_image(client):
     })
     result_doc = json.loads(response.content.decode())
 
-    assert result_doc == doc
+    assert v.validate(result_doc, schema)
     assert response.status == falcon.HTTP_OK
 
-    assert not os.path.exists(f"test/{doc['deleteAccount']['user']['image']}")
+    assert not os.path.exists(f"test/{result_doc['deleteAccount']['user']['image']}")
