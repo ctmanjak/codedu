@@ -13,10 +13,10 @@ class Question(Base):
     view = Column(INTEGER(unsigned=True), nullable=False, default=0)
     like = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
-    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id"), nullable=True)
-    user = relationship('User', backref=backref('questions', order_by=id, cascade="all, delete"), cascade="all, delete")
+    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
+    user = relationship('User', backref='questions')
 
-    tags = relationship("Tag", backref="questions", secondary="question_tag", cascade="all, delete")
+    tags = relationship("Tag", backref="questions", secondary="question_tag")
 
 class Answer(Base):
     __tablename__ = 'answer'
@@ -25,14 +25,14 @@ class Answer(Base):
     content = Column(VARCHAR(1024), nullable=False)
     like = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
-    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id"), nullable=True)
-    user = relationship('User', backref=backref('answers', order_by=id, cascade="all, delete"), cascade="all, delete")
+    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
+    user = relationship('User', backref='answers')
 
-    question_id = Column(BIGINT(unsigned=True), ForeignKey("question.id"), nullable=False)
-    question = relationship('Question', backref=backref('answers', order_by=id, cascade="all, delete"), cascade="all, delete")
+    question_id = Column(BIGINT(unsigned=True), ForeignKey("question.id", ondelete='CASCADE'), nullable=False)
+    question = relationship('Question', backref='answers')
 
 class QuestionTag(Base):
     __tablename__ = 'question_tag'
 
-    question_id = Column(BIGINT(unsigned=True), ForeignKey("question.id"), primary_key=True)
-    tag_id = Column(INTEGER(unsigned=True), ForeignKey("tag.id"), primary_key=True)
+    question_id = Column(BIGINT(unsigned=True), ForeignKey("question.id", ondelete='CASCADE'), primary_key=True)
+    tag_id = Column(INTEGER(unsigned=True), ForeignKey("tag.id", ondelete='CASCADE'), primary_key=True)

@@ -3,6 +3,8 @@ import hmac
 from hashlib import sha256
 import graphene
 
+from look.exc.handler import CodeduExceptionHandler
+
 from falcon import HTTPBadRequest, HTTPUnauthorized
 
 from graphene_sqlalchemy import SQLAlchemyObjectType
@@ -97,10 +99,12 @@ def create_base_schema():
     })
 
     for tablename, model in gql_models.items():
-        if not tablename in ['user', 'post', 'post_comment', 'code', 'code_comment', 'question']:
+        if not tablename in ['user', 'post', 'post_comment', 'code', 'code_comment', 'question', 'answer']:
             fields = {}
             for colname, column in model._meta.model.__table__.columns.items():
                 if not colname == 'created' and not colname == 'modified':
+                    fields[colname] = convert_sqlalchemy_type(getattr(column, 'type', None), column)()
+            for colname, column in model._meta.model.__mapper__.relationships.items():
                     fields[colname] = convert_sqlalchemy_type(getattr(column, 'type', None), column)()
 
             input_classes[tablename] = create_input_class(f"{tablename}Input", fields)

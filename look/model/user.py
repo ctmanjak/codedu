@@ -18,10 +18,10 @@ class User(Base):
     exp = Column(INTEGER(unsigned=True), nullable=False, default=0)
     image = Column(VARCHAR(64))
 
-    learning_progress = relationship("Subchapter", backref="users", secondary="learning_progress", cascade="all, delete")
+    learning_progress = relationship("Subchapter", backref="users", secondary="learning_progress")
 
 class LearningProgress(Base):
     __tablename__ = 'learning_progress'
 
-    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id"), primary_key=True)
-    subchapter_id = Column(INTEGER(unsigned=True), ForeignKey("subchapter.id"), primary_key=True)
+    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='CASCADE'), primary_key=True)
+    subchapter_id = Column(INTEGER(unsigned=True), ForeignKey("subchapter.id", ondelete='CASCADE'), primary_key=True)

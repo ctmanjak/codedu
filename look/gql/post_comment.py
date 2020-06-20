@@ -18,6 +18,7 @@ def create_post_comment_schema():
         create_input_class('CreatePostCommentInput', {
             'post_id': graphene.ID(required=True),
             'content': graphene.String(required=True),
+            'parent_comment_id': graphene.ID(),
         })
     )
 

@@ -6,7 +6,7 @@ from falcon import HTTPUnauthorized
 
 from . import gql_models
 from .util import create_input_class, create_mutation_field, get_instance_by_pk, check_row_by_user_id, \
-    db_session_flush, image_handle
+    db_session_flush, image_handle, simple_create_mutate, simple_update_mutate, simple_delete_mutate
 
 def create_question_schema():
     def create_question_mutate(cls, info, model=None, **kwargs):
@@ -70,7 +70,6 @@ def create_question_schema():
 
                 if info.context['auth']['data']['admin'] or check_row_by_user_id(info.context['auth']['data']['user_id'], model, instance):
                     tmp_instance = instance.one()
-                    instance.one().tags = []
                     instance.delete()
                     return cls(**{model.__tablename__:tmp_instance})
                 else:
@@ -106,6 +105,38 @@ def create_question_schema():
         gql_models['question'],
         delete_question_mutate,
         create_input_class('DeleteQuestionInput', {
+            "id": graphene.ID(required=True)
+        }),
+    )
+
+    return (query_field, mutation_field)
+
+def create_answer_schema():
+    query_field = {}
+    mutation_field = {}
+
+    mutation_field["create_answer"] = create_mutation_field("CreateAnswer",
+        gql_models['answer'],
+        simple_create_mutate,
+        create_input_class('CreateAnswerInput', {
+            'question_id': graphene.ID(required=True),
+            'content': graphene.String(required=True),
+        })
+    )
+
+    mutation_field["update_answer"] = create_mutation_field("UpdateAnswer",
+        gql_models['answer'],
+        simple_update_mutate,
+        create_input_class('UpdateAnswerInput', {
+            "id": graphene.ID(required=True),
+            "content": graphene.String(required=True),
+        }),
+    )
+
+    mutation_field["delete_answer"] = create_mutation_field("DeleteAnswer",
+        gql_models['answer'],
+        simple_delete_mutate,
+        create_input_class('DeleteAnswerInput', {
             "id": graphene.ID(required=True)
         }),
     )

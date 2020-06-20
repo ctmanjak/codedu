@@ -37,12 +37,18 @@ if ! docker ps | grep -wq nfs_server; then
         sleep 0.5
         if ! docker ps | grep -wq nfs_server; then
             docker rm -f nfs_server
-            echo "creating nfs_server"
+            echo "recreating nfs_server"
             docker run -d -v nfs_codedu:/codedu \
                 -e NFS_EXPORT_0='/codedu *(rw,no_root_squash,no_subtree_check,fsid=0)' \
                 --privileged --name nfs_server -p 2049:2049 \
                 erichough/nfs-server
         fi
+    else
+            echo "creating nfs_server"
+        docker run -d -v nfs_codedu:/codedu \
+            -e NFS_EXPORT_0='/codedu *(rw,no_root_squash,no_subtree_check,fsid=0)' \
+            --privileged --name nfs_server -p 2049:2049 \
+            erichough/nfs-server
     fi
     
     # docker service create -d --mount type=volume,source=nfs_image,destination=/codedu/images \

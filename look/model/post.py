@@ -13,5 +13,5 @@ class Post(Base):
     view = Column(INTEGER(unsigned=True), nullable=False, default=0)
     like = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
-    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id"), nullable=True)
-    user = relationship('User', backref=backref('posts', order_by=id, cascade="all, delete"), cascade="all, delete")
+    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
+    user = relationship('User', backref='posts')

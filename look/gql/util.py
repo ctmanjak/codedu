@@ -199,7 +199,7 @@ def code_handle(instance, code=None):
         instance.path = token_path[len(root_path)+1:]
 
 def validate_user_data(data):
-    username_validation = re.match(r"^(?=.*[가-힣A-Za-z_$])[가-힣A-Za-z_\d]{5,32}$", data['username']) if 'username' in data else True
+    username_validation = re.match(r"^(?=.*[가-힣A-Za-z_$])[가-힣A-Za-z_\d]{2,32}$", data['username']) if 'username' in data else True
     password_validation = re.match(r"^(?=.*[A-Za-z$])(?=.*\d)[A-Za-z@$!%*#?&\d]{8,}$", data['password']) if 'password' in data else True
     email_validation = re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", data['email']) if 'email' in data else True
     if not email_validation:
@@ -210,7 +210,7 @@ def validate_user_data(data):
         if username_validation_2:
             raise CodeduExceptionHandler(HTTPBadRequest(description="Username can only contain 한글, alphanumeric characters and underscore."))
         else:
-            raise CodeduExceptionHandler(HTTPBadRequest(description="Username must be at least 5 characters long and including at least one letter."))
+            raise CodeduExceptionHandler(HTTPBadRequest(description="Username must be at least 2 characters long and including at least one letter."))
     if not password_validation:
         # 포함하면 안 되는 문자 있는지 체크
         password_validation_2 = re.search(r"[^A-Za-z@$!%*#?&\d]+", data['password'])

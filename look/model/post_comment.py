@@ -10,11 +10,11 @@ class PostComment(Base):
     content = Column(VARCHAR(1024), nullable=False)
     like = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
-    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id"), nullable=False)
-    user = relationship('User', backref=backref('post_comments', order_by=id, cascade="all, delete"), cascade="all, delete")
+    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
+    user = relationship('User', backref='post_comments')
 
-    post_id = Column(BIGINT(unsigned=True), ForeignKey("post.id"), nullable=False)
-    post = relationship('Post', backref=backref('comments', order_by=id, cascade="all, delete"), cascade="all, delete")
+    post_id = Column(BIGINT(unsigned=True), ForeignKey("post.id", ondelete='CASCADE'), nullable=False)
+    post = relationship('Post', backref='comments')
 
-    parent_comment_id = Column(BIGINT(unsigned=True), ForeignKey("post_comment.id"))
+    parent_comment_id = Column(BIGINT(unsigned=True), ForeignKey("post_comment.id", ondelete='CASCADE'))
     child_comments = relationship('PostComment', backref=backref('parent_comment',  remote_side=[id]))

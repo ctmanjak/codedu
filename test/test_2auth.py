@@ -847,13 +847,13 @@ def test_register_with_invalid_password_5(client):
 def test_register_with_invalid_username_1(client):
     doc = {
         "title": "400 Bad Request",
-        "description": "Username must be at least 5 characters long and including at least one letter.",
+        "description": "Username must be at least 2 characters long and including at least one letter.",
     }
 
     body = {
         "query": '''
             mutation {
-                register(data: {username:"inva", email:"invaliduser@email.com", password:"invaliduser123!"}) {
+                register(data: {username:"i", email:"invaliduser@email.com", password:"invaliduser123!"}) {
                     user {
                         email
                         username

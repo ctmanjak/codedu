@@ -14,8 +14,8 @@ class Code(Base):
     view = Column(INTEGER(unsigned=True), nullable=False, default=0)
     like = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
-    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id"), nullable=True)
-    user = relationship('User', backref=backref('codes', order_by=id, cascade="all, delete"), cascade="all, delete")
+    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
+    user = relationship('User', backref='codes')
 
 class CodeComment(Base):
     __tablename__ = 'code_comment'
@@ -24,11 +24,11 @@ class CodeComment(Base):
     content = Column(VARCHAR(1024), nullable=False)
     like = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
-    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id"), nullable=False)
-    user = relationship('User', backref=backref('code_comments', order_by=id, cascade="all, delete"), cascade="all, delete")
+    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
+    user = relationship('User', backref='code_comments')
 
-    code_id = Column(BIGINT(unsigned=True), ForeignKey("code.id"), nullable=False)
-    code = relationship('Code', backref=backref('comments', order_by=id, cascade="all, delete"), cascade="all, delete")
+    code_id = Column(BIGINT(unsigned=True), ForeignKey("code.id", ondelete='CASCADE'), nullable=False)
+    code = relationship('Code', backref='comments')
 
-    parent_comment_id = Column(BIGINT(unsigned=True), ForeignKey("code_comment.id"))
+    parent_comment_id = Column(BIGINT(unsigned=True), ForeignKey("code_comment.id", ondelete='CASCADE'))
     child_comments = relationship('CodeComment', backref=backref('parent_comment',  remote_side=[id]))
