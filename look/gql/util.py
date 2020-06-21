@@ -133,7 +133,7 @@ def image_handle(tablename, instance, image_info=None):
     if not image_info:
         if instance.image and os.path.exists(f"{root_path}/{instance.image}"):
             os.remove(f"{root_path}/{instance.image}")
-            os.rmdir(f"{root_path}/{'/'.join(instance.image.split('/')[:-1])}")
+            # os.rmdir(f"{root_path}/{'/'.join(instance.image.split('/')[:-1])}")
     elif type(image_info) == list:
         if tablename == "subchapter":
             if not os.path.isdir(f'{image_path}'): os.mkdir(f'{image_path}')
