@@ -108,7 +108,7 @@ def create_base_schema():
     })
 
     for tablename, model in gql_models.items():
-        if not tablename in ['user', 'post', 'post_comment', 'code', 'code_comment', 'question', 'answer', 'subchapter']:
+        if not tablename in ['user', 'post', 'post_comment', 'code', 'code_comment', 'question', 'answer', 'subchapter', 'post_like']:
             fields = {}
             for colname, column in model._meta.model.__table__.columns.items():
                 if not colname == 'created' and not colname == 'modified':

@@ -104,13 +104,14 @@ def create_filter_class(classname, db_model, class_fields={}):
 
     return type(classname, (FilterSet,), class_fields)
 
-def create_node_class(classname, db_model, connection_field_factory):
+def create_node_class(classname, db_model, connection_field_factory=None):
+    meta_fields = {}
+    meta_fields["model"] = db_model
+    meta_fields["interfaces"] = (graphene.Node,)
+    if connection_field_factory:
+        meta_fields["connection_field_factory"] = connection_field_factory
     return type(classname, (SQLAlchemyObjectType,), {
-        "Meta": type("Meta", (), {
-            "model": db_model,
-            "interfaces": (graphene.Node,),
-            "connection_field_factory": connection_field_factory,
-        }),
+        "Meta": type("Meta", (), meta_fields),
     })
 
 def db_session_flush(db_session):

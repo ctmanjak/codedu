@@ -12,7 +12,6 @@ class Code(Base):
     lang = Column(VARCHAR(32), nullable=False)
     path = Column(VARCHAR(64))
     view = Column(INTEGER(unsigned=True), nullable=False, default=0)
-    like = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
     user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
     user = relationship('User', backref=backref('codes', order_by=id))
@@ -22,7 +21,6 @@ class CodeComment(Base):
 
     id = Column(BIGINT(unsigned=True), primary_key=True)
     content = Column(VARCHAR(1024), nullable=False)
-    like = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
     user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
     user = relationship('User', backref=backref('code_comments', order_by=id))
@@ -32,3 +30,21 @@ class CodeComment(Base):
 
     parent_comment_id = Column(BIGINT(unsigned=True), ForeignKey("code_comment.id", ondelete='CASCADE'))
     child_comments = relationship('CodeComment', backref=backref('parent_comment', order_by=id, remote_side=[id]))
+
+class CodeLike(Base):
+    __tablename__ = 'code_like'
+
+    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='CASCADE'), primary_key=True)
+    user = relationship('User', backref=backref('code_likes'))
+    
+    code_id = Column(BIGINT(unsigned=True), ForeignKey("code.id", ondelete='CASCADE'), primary_key=True)
+    code = relationship('Code', backref=backref('likes'))
+
+class CodeCommentLike(Base):
+    __tablename__ = 'code_comment_like'
+
+    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='CASCADE'), primary_key=True)
+    user = relationship('User', backref=backref('code_comment_likes'))
+    
+    code_comment_id = Column(BIGINT(unsigned=True), ForeignKey("code_comment.id", ondelete='CASCADE'), primary_key=True)
+    code_comment = relationship('CodeComment', backref=backref('likes'))

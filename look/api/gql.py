@@ -31,8 +31,15 @@ class Collection(object):
         try:
             result = await self.graphql_execute(req, res)
             image_info = req.context.get('image_info', None)
-            
+
             if not result.errors:
+                if 'code' in result.data:
+                    code = []
+                    for node in result.data['code']['edges']:
+                        if 'path' in node['node']:
+                            with open(f"/codedu/nfs/{node['node']['path']}", 'r') as f:
+                                code.append(f.read())
+                    result.data['code_content'] = code
                 res.status = HTTP_200
                 res.body = json.dumps(result.data)
             else:
