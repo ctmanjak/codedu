@@ -801,7 +801,8 @@ def test_check_code(client):
                     "userId": None
                 }
             }]
-        }
+        },
+        "code_content": [],
     }
 
     body = {
