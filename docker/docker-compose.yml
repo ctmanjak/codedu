@@ -55,6 +55,7 @@ services:
       SECRET_KEY: codedu
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
+      SERVER_IP: ${SERVER_IP}
       PYTHONUNBUFFERED: 0
     volumes:
       - codedu_nfs:/codedu/nfs

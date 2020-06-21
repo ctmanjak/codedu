@@ -7,6 +7,8 @@ from look.exc.handler import CodeduExceptionHandler
 
 from falcon import HTTPBadRequest, HTTPUnauthorized
 
+from sqlalchemy.sql.expression import func, select
+
 from graphene_sqlalchemy import SQLAlchemyObjectType
 from graphene_sqlalchemy.converter import convert_sqlalchemy_type
 from graphene_sqlalchemy_filter import FilterableConnectionField
@@ -90,8 +92,15 @@ def create_base_schema():
     filter_field = {}
     fcf_field = {}
 
+    def random_quiz(cls, info, query, value, model):
+        return query.order_by(func.rand()), None
+
     for tablename, model in gql_models.items():
-        filter_field[tablename] = create_filter_class(f"{tablename}Filter", model._meta.model)()
+        filter_class_fields = {}
+        if tablename in ['quiz']:
+            filter_class_fields['random'] = graphene.Boolean()
+            filter_class_fields['random_filter'] = classmethod(lambda cls, info, query, value, model=model: random_quiz(cls, info, query, value, model))
+        filter_field[tablename] = create_filter_class(f"{tablename}Filter", model._meta.model, filter_class_fields)()
         fcf_field[model._meta.model] = filter_field[tablename]
     
     FCF = type("FCF", (FilterableConnectionField,), {
@@ -99,7 +108,7 @@ def create_base_schema():
     })
 
     for tablename, model in gql_models.items():
-        if not tablename in ['user', 'post', 'post_comment', 'code', 'code_comment', 'question', 'answer']:
+        if not tablename in ['user', 'post', 'post_comment', 'code', 'code_comment', 'question', 'answer', 'subchapter']:
             fields = {}
             for colname, column in model._meta.model.__table__.columns.items():
                 if not colname == 'created' and not colname == 'modified':

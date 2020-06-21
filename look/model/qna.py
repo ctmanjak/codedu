@@ -14,9 +14,9 @@ class Question(Base):
     like = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
     user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
-    user = relationship('User', backref='questions')
+    user = relationship('User', backref=backref('questions', order_by=id))
 
-    tags = relationship("Tag", backref="questions", secondary="question_tag")
+    tags = relationship("Tag", backref=backref("questions", order_by=id), secondary="question_tag")
 
 class Answer(Base):
     __tablename__ = 'answer'
@@ -26,10 +26,10 @@ class Answer(Base):
     like = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
     user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
-    user = relationship('User', backref='answers')
+    user = relationship('User', backref=backref('answers', order_by=id))
 
     question_id = Column(BIGINT(unsigned=True), ForeignKey("question.id", ondelete='CASCADE'), nullable=False)
-    question = relationship('Question', backref='answers')
+    question = relationship('Question', backref=backref('answers', order_by=id))
 
 class QuestionTag(Base):
     __tablename__ = 'question_tag'

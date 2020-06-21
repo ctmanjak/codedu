@@ -37,8 +37,9 @@ class Collection(object):
                 res.body = json.dumps(result.data)
             else:
                 if image_info:
-                    if os.path.isfile(f"./{image_info['dir']}{image_info['name']}{image_info['ext']}"):
-                        os.remove(f"./{image_info['dir']}{image_info['name']}{image_info['ext']}")
+                    for image in image_info:
+                        if os.path.isfile(image['full_path']):
+                            os.remove(image['full_path'])
 
                 raise CodeduExceptionHandler(result.errors[0].args[0])
                 print(result.errors)

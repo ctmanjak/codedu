@@ -9,6 +9,7 @@ from .post_comment import PostComment
 from .code import Code, CodeComment
 from .qna import Question, Answer, QuestionTag
 from .tag import Tag
+from .quiz import Quiz
 
 __all__ = [
     "Base",
@@ -25,4 +26,5 @@ __all__ = [
     "Answer",
     "QuestionTag",
     "Tag",
+    "Quiz",
 ]

@@ -5,6 +5,8 @@ import string
 import secrets
 import graphene
 
+from hashlib import sha256
+
 from traceback import print_exc
 
 from look.exc.handler import CodeduExceptionHandler
@@ -86,7 +88,7 @@ def create_connection_class(classname, model):
         "resolve_total_count": lambda self, info, **kwargs: self.iterable.count(),
     })
 
-def create_filter_class(classname, db_model):
+def create_filter_class(classname, db_model, class_fields={}):
     fields = {}
     for colname, column in db_model.__table__.columns.items():
         if column.expression.foreign_keys or column.expression.primary_key:
@@ -98,11 +100,9 @@ def create_filter_class(classname, db_model):
         "model": db_model,
         "fields": fields,
     }
-    class_field = {
-        "Meta": type("Meta", (), meta_field),
-    }
+    class_fields["Meta"] = type("Meta", (), meta_field)
 
-    return type(classname, (FilterSet,), class_field)
+    return type(classname, (FilterSet,), class_fields)
 
 def create_node_class(classname, db_model, connection_field_factory):
     return type(classname, (SQLAlchemyObjectType,), {
@@ -129,48 +129,64 @@ def db_session_flush(db_session):
         raise CodeduExceptionHandler(HTTPBadRequest(description="UNKNOWN ERROR"))
 
 def image_handle(tablename, instance, image_info=None):
-    print(instance.image)
+    image_path = f"{root_path}/images"
     if not image_info:
         if instance.image and os.path.exists(f"{root_path}/{instance.image}"):
             os.remove(f"{root_path}/{instance.image}")
             os.rmdir(f"{root_path}/{'/'.join(instance.image.split('/')[:-1])}")
+    elif type(image_info) == list:
+        if tablename == "subchapter":
+            if not os.path.isdir(f'{image_path}'): os.mkdir(f'{image_path}')
+            if not os.path.isdir(f'{image_path}/{tablename}'): os.mkdir(f'{image_path}/{tablename}')
+            
+            if not instance.token:
+                while True:
+                    token = make_token(12)
+                    if not os.path.isdir(f"{image_path}/{tablename}/{token}"):
+                        os.mkdir(f"{image_path}/{tablename}/{token}")
+                        break
+                instance.token = token
+            else: token = instance.token
+            token_path = f"{image_path}/{tablename}/{token}"
+            token_path_list = []
+            
+            for image in image_info:
+                while True:
+                    token = make_token(12)
+                    if not os.path.isfile(f"{token_path}/{token}{image['ext']}"): break
+                token_path_list.append(f"{token_path}/{token}{image['ext']}")
+                if not os.path.isdir(token_path): os.mkdir(token_path)
+                os.rename(image['full_path'], token_path_list[-1])
+                instance.content = re.sub(f"\[codedu={image['org_name']}\]", f"{'http://'+os.getenv('SERVER_IP')+'/'+token_path_list[-1][len(root_path)+1:]}", instance.content)
+            return token_path_list
     else:
-        image_path = f"{root_path}/images"
+        instance_id = f"{instance.id:010}"
         if not os.path.isdir(f'{image_path}'): os.mkdir(f'{image_path}')
         if not os.path.isdir(f'{image_path}/{tablename}'): os.mkdir(f'{image_path}/{tablename}')
-        instance_id = f"{instance.id:010}"
 
         if instance.image:
             if os.path.exists(f"{root_path}/{instance.image}"):
                 os.remove(f"{root_path}/{instance.image}")
 
-        os.rename(f"{image_info['dir']}{image_info['name']}{image_info['ext']}", f"./{image_path}/{tablename}/{instance_id}{image_info['ext']}")
-        image_info['dir'] = f"{image_path}/{tablename}/"
-        image_info['name'] = f"{instance_id}"
+        while True:
+            token = make_token(12)
+            if not os.path.isfile(f"{image_path}/{tablename}/{token}{image_info['ext']}"): break
+        token_path = f"{image_path}/{tablename}/{token}{image_info['ext']}"
 
-        tmp_path = f"{image_info['dir']}{image_info['name']}{image_info['ext']}"
-        token_path = make_token_path(tmp_path)
-        os.rename(tmp_path, token_path)
+        os.rename(image_info['full_path'], token_path)
         instance.image = token_path[len(root_path)+1:]
+
+        return token_path
 
 code_ext = {"python3":".py", "clang":".c"}
 
 def make_token(length):
     return ''.join(secrets.choice(string.ascii_letters + string.digits) for i in range(length))
 
-def make_token_path(file_path, length=12):
-    split_path = file_path.split("/")
-    ext = split_path[-1].split(".")[-1]
-    file_type = split_path[1]
+def make_token_path(file_path, instance_id, length=12):
     while True:
         tmp_token = make_token(length)
-        if file_type == "images":
-            token_path = "/".join(split_path[:-1] + [f"{tmp_token}.{ext}"])
-        elif file_type == "codes":
-            split_path[-2] = tmp_token
-            if not os.path.isdir('/'.join(split_path[:-1])):
-                os.mkdir('/'.join(split_path[:-1]))
-                return "/".join(split_path)
+        token_path = file_path.replace(instance_id, tmp_token)
         if not os.path.isdir(token_path): break
 
     return token_path
@@ -182,20 +198,20 @@ def code_handle(instance, code=None):
             os.rmdir(f"{root_path}/{'/'.join(instance.path.split('/')[:-1])}")
     else:
         code_path = f"{root_path}/codes"
-        code_id = f"{instance.id:010}"
+    
         if not os.path.isdir(f'{code_path}'): os.mkdir(f'{code_path}')
         if not os.path.isdir(f'{code_path}/{instance.lang}'): os.mkdir(f'{code_path}/{instance.lang}')
-        if not os.path.isdir(f'{code_path}/{instance.lang}/{code_id}'): os.mkdir(f'{code_path}/{instance.lang}/{code_id}')
-        
-        full_path = f"{code_path}/{instance.lang}/{code_id}/main{code_ext[instance.lang]}"
 
-        with open(full_path, "w") as f:
+        while True:
+            token = make_token(12)
+            if not os.path.isdir(f"{code_path}/{instance.lang}/{token}"):
+                os.mkdir(f"{code_path}/{instance.lang}/{token}")
+                break
+        token_path = f"{code_path}/{instance.lang}/{token}/main{code_ext[instance.lang]}"
+
+        with open(token_path, "w") as f:
             f.write(code)
         
-        token_path = make_token_path(full_path)
-        os.rename(full_path, token_path)
-        if os.path.isdir('/'.join(full_path.split('/')[:-1])):
-            os.rmdir('/'.join(full_path.split('/')[:-1]))
         instance.path = token_path[len(root_path)+1:]
 
 def validate_user_data(data):

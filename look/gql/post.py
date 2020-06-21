@@ -23,7 +23,7 @@ def create_post_schema():
                     db_session_flush(db_session)
 
                     if image_info:
-                        image_handle('post', instance, image_info)
+                        image_handle('post', instance, image_info[0])
 
                 return cls(**{model.__tablename__:instance})
         else:
@@ -41,7 +41,7 @@ def create_post_schema():
                 if info.context['auth']['data']['admin'] or check_row_by_user_id(info.context['auth']['data']['user_id'], model, instance):
                     instance.update(data)
                     if image_info:
-                        image_handle('post', instance.one(), image_info)
+                        image_handle('post', instance.one(), image_info[0])
                     return cls(**{model.__tablename__:instance.one()})
                 else:
                     raise CodeduExceptionHandler(HTTPUnauthorized(description="PERMISSION DENIED"))

@@ -60,7 +60,7 @@ def create_auth_schema():
                 db_session_flush(db_session)
                 
                 if image_info:
-                    image_handle('user', instance, image_info)
+                    image_handle('user', instance, image_info[0])
 
             return cls(**{model.__tablename__:instance})
 
@@ -84,7 +84,7 @@ def create_auth_schema():
                 if info.context['auth']['data']['admin'] or (instance.one() and instance.one().password == data['password']):
                     instance.update(data)
                     if image_info:
-                        image_handle('user', instance.one(), image_info)
+                        image_handle('user', instance.one(), image_info[0])
                     return cls(**{model.__tablename__:instance.one()})
                 else:
                     raise CodeduExceptionHandler(HTTPBadRequest(description="INVALID PASSWORD"))

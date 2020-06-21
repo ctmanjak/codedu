@@ -13,4 +13,4 @@ class Chapter(Base):
     subtitle = Column(VARCHAR(128), default=default_subtitle)
 
     board_id = Column(INTEGER(unsigned=True), ForeignKey("board.id", ondelete='SET NULL'))
-    board = relationship('Board', backref='chapters')
+    board = relationship('Board', backref=backref('chapters', order_by=id))

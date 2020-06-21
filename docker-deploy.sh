@@ -2,9 +2,9 @@
 
 HOST_IP=$(hostname -I | awk '{print $1}')
 if [ "${1}" ]; then
-    TARGET_IP=$1
+    export TARGET_IP=$1
 else
-    TARGET_IP=$HOST_IP
+    export TARGET_IP=$HOST_IP
 fi
 
 if nc -zw3 "${TARGET_IP}" 2376; then

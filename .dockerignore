@@ -20,6 +20,7 @@
 .venv/
 images/
 codes/
+nfs/
 cert/
 **/__pycache__
 todo.txt

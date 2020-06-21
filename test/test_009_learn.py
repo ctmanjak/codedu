@@ -503,7 +503,7 @@ def test_delete_subchapter(client):
     body = {
         "query": '''
             mutation {
-                deleteSubchapter(data: {id: 1, title:"pytest_updatedsubchapter-1"}) {
+                deleteSubchapter(data: {id: 1}) {
                     subchapter {
                         title
                     }
@@ -652,3 +652,48 @@ def test_check_learn(client):
 
     assert result_doc == doc
     assert response.status == falcon.HTTP_OK
+
+# def test_create_subchapter_with_image(client):
+#     doc = {
+#         "CreateSubchapter": {
+#             "subchapter": {
+#                 "title": "pytest_subchapter-1",
+#                 "content": "pytest_subchapter-1's content",
+#             }
+#         },
+#     }
+
+#     body = {
+#         "query": '''
+#             mutation {
+#                 CreateSubchapter: createSubchapter(data: {chapterId: 1, title:"pytest_subchapter-1", content:"pytest_subchapter-1's content"}) {
+#                     subchapter {
+#                         title
+#                         content
+#                     }
+#                 }
+#             }
+#         ''',
+#         "variables": {
+#             "content": "content"
+#         }
+#     }
+
+#     fake_image_byte = b"a" * (2 * 1024 * 1024)
+    
+#     m = MultipartEncoder(
+#     fields={'data': ('data', json.dumps(body), 'application/json'),
+#             'image': ('a.png', fake_image_byte, 'image/png')}
+#     )
+    
+#     response = client.simulate_post('/api/graphql', content_type=m.content_type, body=m.to_string(), headers={
+#         "Authorization": my_token,
+#     })
+
+#     result_doc = json.loads(response.content.decode())
+
+#     assert v.validate(result_doc, schema)
+#     assert response.status == falcon.HTTP_OK
+
+#     with open(f"test/{result_doc['createPost']['post']['image']}", 'rb') as f:
+#         assert f.read() == fake_image_byte
