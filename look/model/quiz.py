@@ -13,4 +13,4 @@ class Quiz(Base):
     answer = Column(INTEGER, nullable=False)
 
     subchapter_id = Column(INTEGER(unsigned=True), ForeignKey("subchapter.id", ondelete='SET NULL'))
-    subchapter = relationship('Subchapter', backref=backref('quizzes', order_by=id))
+    subchapter = relationship('Subchapter', backref=backref('quizzes'))

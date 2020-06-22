@@ -12,7 +12,7 @@ class Category(Base):
     title = Column(VARCHAR(64), nullable=False)
     subtitle = Column(VARCHAR(128), default=default_subtitle)
 
-    boards = relationship('Board', backref=backref("categories", order_by=id), secondary="category_board")
+    boards = relationship('Board', backref=backref("categories"), secondary="category_board")
 
 class CategoryBoard(Base):
     __tablename__ = 'category_board'

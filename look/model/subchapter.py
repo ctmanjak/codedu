@@ -15,4 +15,4 @@ class Subchapter(Base):
     token = Column(CHAR(12), unique=True)
 
     chapter_id = Column(INTEGER(unsigned=True), ForeignKey("chapter.id", ondelete='SET NULL'))
-    chapter = relationship('Chapter', backref=backref('subchapters', order_by=id))
+    chapter = relationship('Chapter', backref=backref('subchapters'))

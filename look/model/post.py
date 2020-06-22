@@ -13,4 +13,4 @@ class Post(Base):
     view = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
     user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
-    user = relationship('User', backref=backref('posts', order_by=id))
+    user = relationship('User', backref=backref('posts'))

@@ -13,9 +13,9 @@ class Question(Base):
     view = Column(INTEGER(unsigned=True), nullable=False, default=0)
 
     user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
-    user = relationship('User', backref=backref('questions', order_by=id))
+    user = relationship('User', backref=backref('questions'))
 
-    tags = relationship("Tag", backref=backref("questions", order_by=id), secondary="question_tag")
+    tags = relationship("Tag", backref=backref("questions"), secondary="question_tag")
 
 class Answer(Base):
     __tablename__ = 'answer'
@@ -24,10 +24,10 @@ class Answer(Base):
     content = Column(VARCHAR(1024), nullable=False)
 
     user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
-    user = relationship('User', backref=backref('answers', order_by=id))
+    user = relationship('User', backref=backref('answers'))
 
     question_id = Column(BIGINT(unsigned=True), ForeignKey("question.id", ondelete='CASCADE'), nullable=False)
-    question = relationship('Question', backref=backref('answers', order_by=id))
+    question = relationship('Question', backref=backref('answers'))
 
 class QuestionTag(Base):
     __tablename__ = 'question_tag'

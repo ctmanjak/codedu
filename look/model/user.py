@@ -18,7 +18,7 @@ class User(Base):
     exp = Column(INTEGER(unsigned=True), nullable=False, default=0)
     image = Column(VARCHAR(64))
 
-    learning_progress = relationship("Subchapter", backref=backref("users", order_by=id), secondary="learning_progress")
+    learning_progress = relationship("Subchapter", backref=backref("users"), secondary="learning_progress")
 
 class LearningProgress(Base):
     __tablename__ = 'learning_progress'
