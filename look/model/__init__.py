@@ -9,8 +9,9 @@ from .post_comment import PostComment
 from .code import Code, CodeComment
 from .qna import Question, Answer, QuestionTag
 from .tag import Tag
-from .quiz import Quiz
+# from .quiz import Quiz
 from .like import Like, PostLike, PostCommentLike, CodeLike, CodeCommentLike, QuestionLike, AnswerLike
+from .lesson import Lesson, LessonQuiz, LessonQuizAnswer
 
 __all__ = [
     "Base",
@@ -27,7 +28,7 @@ __all__ = [
     "Answer",
     "QuestionTag",
     "Tag",
-    "Quiz",
+    # "Quiz",
     "Like"
     "PostLike",
     "PostCommentLike",
@@ -35,4 +36,7 @@ __all__ = [
     "CodeCommentLike",
     "QuestionLike",
     "AnswerLike",
+    "Lesson",
+    "LessonQuiz",
+    "LessonQuizAnswer",
 ]

@@ -136,29 +136,29 @@ def image_handle(tablename, instance, image_info=None):
             os.remove(f"{root_path}/{instance.image}")
             # os.rmdir(f"{root_path}/{'/'.join(instance.image.split('/')[:-1])}")
     elif type(image_info) == list:
-        if tablename == "subchapter":
+        if tablename == "lesson":
             if not os.path.isdir(f'{image_path}'): os.mkdir(f'{image_path}')
             if not os.path.isdir(f'{image_path}/{tablename}'): os.mkdir(f'{image_path}/{tablename}')
             
-            if not instance.token:
-                while True:
-                    token = make_token(12)
-                    if not os.path.isdir(f"{image_path}/{tablename}/{token}"):
-                        os.mkdir(f"{image_path}/{tablename}/{token}")
-                        break
-                instance.token = token
-            else: token = instance.token
-            token_path = f"{image_path}/{tablename}/{token}"
+            # if not instance.token:
+            #     while True:
+            #         token = make_token(12)
+            #         if not os.path.isdir(f"{image_path}/{tablename}/{token}"):
+            #             os.mkdir(f"{image_path}/{tablename}/{token}")
+            #             break
+            #     instance.token = token
+            # else: token = instance.token
+            file_path = f"{image_path}/{tablename}"
             token_path_list = []
             
             for image in image_info:
                 while True:
                     token = make_token(12)
-                    if not os.path.isfile(f"{token_path}/{token}{image['ext']}"): break
-                token_path_list.append(f"{token_path}/{token}{image['ext']}")
-                if not os.path.isdir(token_path): os.mkdir(token_path)
+                    if not os.path.isfile(f"{file_path}/{token}{image['ext']}"): break
+                token_path_list.append(f"{file_path}/{token}{image['ext']}")
+                if not os.path.isdir(file_path): os.mkdir(file_path)
                 os.rename(image['full_path'], token_path_list[-1])
-                instance.content = re.sub(f"\[codedu={image['org_name']}\]", f"{'http://'+os.getenv('SERVER_IP')+'/'+token_path_list[-1][len(root_path)+1:]}", instance.content)
+                instance.content = re.sub(f"\[image={image['org_name']}\]", f"{'http://'+os.getenv('SERVER_IP')+'/'+token_path_list[-1][len(root_path)+1:]}", instance.content)
             return token_path_list
     else:
         instance_id = f"{instance.id:010}"

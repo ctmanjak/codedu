@@ -261,49 +261,41 @@ def test_create_subchapter(client):
         "CreateSubchapter": {
             "subchapter": {
                 "title": "pytest_subchapter-1",
-                "content": "pytest_subchapter-1's content",
             }
         },
         "CreateSubchapter2": {
             "subchapter": {
                 "title": "pytest_subchapter-2",
-                "content": "pytest_subchapter-2's content",
             }
         },
         "CreateSubchapter3": {
             "subchapter": {
                 "title": "pytest_subchapter-3",
-                "content": "pytest_subchapter-3's content",
             }
         },
         "CreateSubchapter4": {
             "subchapter": {
                 "title": "pytest_subchapter-4",
-                "content": "pytest_subchapter-4's content",
             }
         },
         "CreateSubchapter5": {
             "subchapter": {
                 "title": "pytest_subchapter-5",
-                "content": "pytest_subchapter-5's content",
             }
         },
         "CreateSubchapter6": {
             "subchapter": {
                 "title": "pytest_subchapter-6",
-                "content": "pytest_subchapter-6's content",
             }
         },
         "CreateSubchapter7": {
             "subchapter": {
                 "title": "pytest_subchapter-7",
-                "content": "pytest_subchapter-7's content",
             }
         },
         "CreateSubchapter8": {
             "subchapter": {
                 "title": "pytest_subchapter-8",
-                "content": "pytest_subchapter-8's content",
             }
         },
     }
@@ -311,52 +303,44 @@ def test_create_subchapter(client):
     body = {
         "query": '''
             mutation {
-                CreateSubchapter: createSubchapter(data: {chapterId: 1, title:"pytest_subchapter-1", content:"pytest_subchapter-1's content"}) {
+                CreateSubchapter: createSubchapter(data: {chapterId: 1, title:"pytest_subchapter-1"}) {
                     subchapter {
                         title
-                        content
                     }
                 }
-                CreateSubchapter2: createSubchapter(data: {chapterId: 1, title:"pytest_subchapter-2", content:"pytest_subchapter-2's content"}) {
+                CreateSubchapter2: createSubchapter(data: {chapterId: 1, title:"pytest_subchapter-2"}) {
                     subchapter {
                         title
-                        content
                     }
                 }
-                CreateSubchapter3: createSubchapter(data: {chapterId: 2, title:"pytest_subchapter-3", content:"pytest_subchapter-3's content"}) {
+                CreateSubchapter3: createSubchapter(data: {chapterId: 2, title:"pytest_subchapter-3"}) {
                     subchapter {
                         title
-                        content
                     }
                 }
-                CreateSubchapter4: createSubchapter(data: {chapterId: 2, title:"pytest_subchapter-4", content:"pytest_subchapter-4's content"}) {
+                CreateSubchapter4: createSubchapter(data: {chapterId: 2, title:"pytest_subchapter-4"}) {
                     subchapter {
                         title
-                        content
                     }
                 }
-                CreateSubchapter5: createSubchapter(data: {chapterId: 3, title:"pytest_subchapter-5", content:"pytest_subchapter-5's content"}) {
+                CreateSubchapter5: createSubchapter(data: {chapterId: 3, title:"pytest_subchapter-5"}) {
                     subchapter {
                         title
-                        content
                     }
                 }
-                CreateSubchapter6: createSubchapter(data: {chapterId: 3, title:"pytest_subchapter-6", content:"pytest_subchapter-6's content"}) {
+                CreateSubchapter6: createSubchapter(data: {chapterId: 3, title:"pytest_subchapter-6"}) {
                     subchapter {
                         title
-                        content
                     }
                 }
-                CreateSubchapter7: createSubchapter(data: {chapterId: 4, title:"pytest_subchapter-7", content:"pytest_subchapter-7's content"}) {
+                CreateSubchapter7: createSubchapter(data: {chapterId: 4, title:"pytest_subchapter-7"}) {
                     subchapter {
                         title
-                        content
                     }
                 }
-                CreateSubchapter8: createSubchapter(data: {chapterId: 4, title:"pytest_subchapter-8", content:"pytest_subchapter-8's content"}) {
+                CreateSubchapter8: createSubchapter(data: {chapterId: 4, title:"pytest_subchapter-8"}) {
                     subchapter {
                         title
-                        content
                     }
                 }
             }

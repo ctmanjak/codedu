@@ -5,8 +5,9 @@ from .post import create_post_schema
 from .post_comment import create_post_comment_schema
 from .code import create_code_schema, create_code_comment_schema
 from .qna import create_question_schema, create_answer_schema
-from .subchapter import create_subchapter_schema
+# from .subchapter import create_subchapter_schema
 from .like import create_like_schema
+from .lesson import create_lesson_schema, create_lesson_quiz_schema
 
 create_gql_models()
 print(gql_models)
@@ -20,7 +21,9 @@ __all__ = [
     "create_code_comment_schema",
     "create_question_schema",
     "create_answer_schema",
-    "create_subchapter_schema",
+    # "create_subchapter_schema",
     "create_like_schema",
+    "create_lesson_schema",
+    "create_lesson_quiz_schema",
     "gql_models",
 ]

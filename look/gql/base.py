@@ -40,49 +40,47 @@ def create_base_schema():
         return user
 
     def create_mutate(cls, info, model=None, **kwargs):
-        model = model._meta.model
-        data = kwargs.get('data', None)
-        if data:
-            db_session = info.context.get('session', None)
-            if db_session:
-                instance = model(**data)
-                db_session.add(instance)
-                db_session_flush(db_session)
+        if info.context['auth']['data']:
+            if not info.context['auth']['data']['admin']: raise CodeduExceptionHandler(HTTPUnauthorized(description='PERMISSION DENIED'))
+            model = model._meta.model
+            data = kwargs.get('data', None)
+            if data:
+                db_session = info.context.get('session', None)
+                if db_session:
+                    instance = model(**data)
+                    db_session.add(instance)
+                    db_session_flush(db_session)
 
-            return cls(**{model.__tablename__:instance})
+                return cls(**{model.__tablename__:instance})
+        else:
+            raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
 
     def update_mutate(cls, info, model=None, **kwargs):
         if info.context['auth']['data']:
+            if not info.context['auth']['data']['admin']: raise CodeduExceptionHandler(HTTPUnauthorized(description='PERMISSION DENIED'))
             query = model.get_query(info)
             model = model._meta.model
             data = kwargs.get('data', None)
             if data:
                 instance = get_instance_by_pk(query, model, data)
 
-                if info.context['auth']['data']['admin']:
-                # if info.context['auth']['data']['admin'] and check_row_by_user_id(info.context['auth']['data']['user_id'], model, instance):
-                    instance.update(data)
-                    return cls(**{model.__tablename__:instance.one()})
-                else:
-                    raise CodeduExceptionHandler(HTTPUnauthorized(description='PERMISSION DENIED'))
+                instance.update(data)
+                return cls(**{model.__tablename__:instance.one()})
         else:
             raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
 
     def delete_mutate(cls, info, model=None, **kwargs):
         if info.context['auth']['data']:
+            if not info.context['auth']['data']['admin']: raise CodeduExceptionHandler(HTTPUnauthorized(description='PERMISSION DENIED'))
             query = model.get_query(info)
             model = model._meta.model
             data = kwargs.get('data', None)
             if data:
                 instance = get_instance_by_pk(query, model, data)
 
-                if info.context['auth']['data']['admin']:
-                # if info.context['auth']['data']['admin'] and check_row_by_user_id(info.context['auth']['data']['user_id'], model, instance):
-                    tmp_instance = instance.one()
-                    instance.delete()
-                    return cls(**{model.__tablename__:tmp_instance})
-                else:
-                    raise CodeduExceptionHandler(HTTPUnauthorized(description='PERMISSION DENIED'))
+                tmp_instance = instance.one()
+                instance.delete()
+                return cls(**{model.__tablename__:tmp_instance})
         else:
             raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
 
@@ -97,7 +95,7 @@ def create_base_schema():
 
     for tablename, model in gql_models.items():
         filter_class_fields = {}
-        if tablename in ['quiz']:
+        if tablename in ['lesson_quiz']:
             filter_class_fields['random'] = graphene.Boolean()
             filter_class_fields['random_filter'] = classmethod(lambda cls, info, query, value, model=model: random_quiz(cls, info, query, value, model))
         filter_field[tablename] = create_filter_class(f"{tablename}Filter", model._meta.model, filter_class_fields)()
@@ -106,9 +104,10 @@ def create_base_schema():
     FCF = type("FCF", (FilterableConnectionField,), {
         "filters":fcf_field,
     })
-
+    except_table = ['user', 'post', 'post_comment', 'code', 'code_comment', 'question', 'answer', 'like']
+    except_table += ["post_like", "post_comment_like", "code_like", "code_comment_like", "question_like", "answer_like"]
     for tablename, model in gql_models.items():
-        if not tablename in ['user', 'post', 'post_comment', 'code', 'code_comment', 'question', 'answer', 'subchapter', 'post_like']:
+        if not tablename in except_table:
             fields = {}
             for colname, column in model._meta.model.__table__.columns.items():
                 if not colname == 'created' and not colname == 'modified':

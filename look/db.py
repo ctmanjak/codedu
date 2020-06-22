@@ -174,7 +174,7 @@ def insert_dummy_data(db_session):
             },
         ],
         'chapter' : [{'title':f'Chapter{i+1}'} for i in range(4)],
-        'subchapter' : [{'title':f'Subchapter{i+1}', 'content':f'Subchapter{i+1}\'s content'} for i in range(8)],
+        'subchapter' : [{'title':f'Subchapter{i+1}'} for i in range(8)],
     }
     for data in dummy_data["user"]:
         data["password"] = hmac.new(Config.SECRET_KEY.encode(), data['password'].encode(), sha256).hexdigest()
