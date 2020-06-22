@@ -23,21 +23,13 @@ def init_schema():
         create_answer_schema,
         create_subchapter_schema,
         create_like_schema,
-        # create_post_like_schema,
     ]
 
     for schema in schemas:
-        if not schema == create_like_schema:
-            tmp_query_field, tmp_mutation_field = schema()
+        tmp_query_field, tmp_mutation_field = schema()
 
-            query_field.update(tmp_query_field)
-            mutation_field.update(tmp_mutation_field)
-        else:
-            for tablename in ['post', 'post_comment', 'question', 'answer', 'code', 'code_comment']:
-                tmp_query_field, tmp_mutation_field = schema(tablename)
-
-                query_field.update(tmp_query_field)
-                mutation_field.update(tmp_mutation_field)
+        query_field.update(tmp_query_field)
+        mutation_field.update(tmp_mutation_field)
 
     Query = type("Query", (graphene.ObjectType,), query_field)
     Mutation = type("Mutation", (graphene.ObjectType,), mutation_field)

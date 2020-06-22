@@ -34,15 +34,15 @@ def create_gql_model_class(classname, db_model, fields={}, meta_fields={}):
 def get_instance_by_pk(query, db_model, data):
     primary_keys = [a for a in db_model.__table__.primary_key]
     instance = None
-
+    
     find_pks = {}
     for pk in primary_keys:
         if pk.name in data:
             find_pks[pk.name] = data[pk.name]
-
+            
     if find_pks:
         instance = query.filter_by(**find_pks)
-
+        
     return instance
 
 def create_input_class(classname, fields):
@@ -285,5 +285,19 @@ def simple_delete_mutate(cls, info, model=None, **kwargs):
                 return cls(**{model.__tablename__:tmp_instance})
             else:
                 raise CodeduExceptionHandler(HTTPUnauthorized(description="PERMISSION DENIED"))
+    else:
+        raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
+
+def simple_update_view_mutate(cls, info, model=None, **kwargs):
+    if info.context['auth']['data']:
+        query = model.get_query(info)
+        model = model._meta.model
+        data = kwargs.get('data', None)
+        image_info = info.context.get('image_info', None)
+        if data:
+            instance = get_instance_by_pk(query, model, data)
+            data = {"view": instance.one().view + 1}
+            instance.update(data)
+            return cls(**{model.__tablename__:instance.one()})
     else:
         raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))

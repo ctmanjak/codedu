@@ -14,12 +14,3 @@ class Post(Base):
 
     user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='SET NULL'))
     user = relationship('User', backref=backref('posts', order_by=id))
-
-class PostLike(Base):
-    __tablename__ = 'post_like'
-
-    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='CASCADE'), primary_key=True)
-    user = relationship('User', backref=backref('post_likes'))
-    
-    post_id = Column(BIGINT(unsigned=True), ForeignKey("post.id", ondelete='CASCADE'), primary_key=True)
-    post = relationship('Post', backref=backref('likes'))

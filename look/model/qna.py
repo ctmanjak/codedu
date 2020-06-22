@@ -34,21 +34,3 @@ class QuestionTag(Base):
 
     question_id = Column(BIGINT(unsigned=True), ForeignKey("question.id", ondelete='CASCADE'), primary_key=True)
     tag_id = Column(INTEGER(unsigned=True), ForeignKey("tag.id", ondelete='CASCADE'), primary_key=True)
-
-class QuestionLike(Base):
-    __tablename__ = 'question_like'
-
-    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='CASCADE'), primary_key=True)
-    user = relationship('User', backref=backref('question_likes'))
-    
-    question_id = Column(BIGINT(unsigned=True), ForeignKey("question.id", ondelete='CASCADE'), primary_key=True)
-    question = relationship('Question', backref=backref('likes'))
-
-class AnswerLike(Base):
-    __tablename__ = 'answer_like'
-
-    user_id = Column(INTEGER(unsigned=True), ForeignKey("user.id", ondelete='CASCADE'), primary_key=True)
-    user = relationship('User', backref=backref('answer_likes'))
-    
-    answer_id = Column(BIGINT(unsigned=True), ForeignKey("answer.id", ondelete='CASCADE'), primary_key=True)
-    answer = relationship('Answer', backref=backref('likes'))

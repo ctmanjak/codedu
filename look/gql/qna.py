@@ -6,7 +6,8 @@ from falcon import HTTPUnauthorized
 
 from . import gql_models
 from .util import create_input_class, create_mutation_field, get_instance_by_pk, check_row_by_user_id, \
-    db_session_flush, image_handle, simple_create_mutate, simple_update_mutate, simple_delete_mutate
+    db_session_flush, image_handle, simple_create_mutate, simple_update_mutate, simple_delete_mutate, \
+    simple_update_view_mutate
 
 def create_question_schema():
     def create_question_mutate(cls, info, model=None, **kwargs):
@@ -106,6 +107,14 @@ def create_question_schema():
         delete_question_mutate,
         create_input_class('DeleteQuestionInput', {
             "id": graphene.ID(required=True)
+        }),
+    )
+
+    query_field["update_question_view"] = create_mutation_field("UpdateQuestionView",
+        gql_models['question'],
+        simple_update_view_mutate,
+        create_input_class('UpdateQuestionViewInput', {
+            "id": graphene.ID(required=True),
         }),
     )
 

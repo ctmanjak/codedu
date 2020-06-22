@@ -6,7 +6,7 @@ from falcon import HTTPUnauthorized
 
 from . import gql_models
 from .util import create_input_class, create_mutation_field, get_instance_by_pk, check_row_by_user_id, \
-    db_session_flush, image_handle
+    db_session_flush, image_handle, simple_update_view_mutate
 
 def create_post_schema():
     def create_post_mutate(cls, info, model=None, **kwargs):
@@ -91,6 +91,14 @@ def create_post_schema():
         delete_post_mutate,
         create_input_class('DeletePostInput', {
             "id": graphene.ID(required=True)
+        }),
+    )
+
+    query_field["update_post_view"] = create_mutation_field("UpdatePostView",
+        gql_models['post'],
+        simple_update_view_mutate,
+        create_input_class('UpdatePostViewInput', {
+            "id": graphene.ID(required=True),
         }),
     )
 
