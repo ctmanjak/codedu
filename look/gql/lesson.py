@@ -63,8 +63,8 @@ def create_lesson_schema():
 
                 tmp_instance = instance.one()
                 instance.delete()
-                if tmp_instance.token:
-                    shutil.rmtree(f"{root_path}/images/lesson/{tmp_instance.token}")
+                # if tmp_instance.token:
+                #     shutil.rmtree(f"{root_path}/images/lesson/{tmp_instance.token}")
                 return cls(**{model.__tablename__:tmp_instance})
         else:
             raise CodeduExceptionHandler(HTTPUnauthorized(description=info.context['auth']['description']))
