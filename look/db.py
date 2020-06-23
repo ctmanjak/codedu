@@ -241,6 +241,7 @@ def insert_dummy_data(db_session):
         # db_session.add_all(models[table])
         for model in models[table]:
             db_session.add(model)
+            db_session.flush()
 
     try:
         db_session.commit()
