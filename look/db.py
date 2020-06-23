@@ -229,6 +229,12 @@ def insert_dummy_data(db_session):
         for data in dummy_data[table]:
             models[table].append(get_class_by_tablename(table)(**data))
 
+    for table in models:
+        db_session.add_all(models[table])
+        # for model in models[table]:
+        #     # db_session.add(model)
+        #     # db_session.flush()
+
     for rel in relationships:
         tmp = {}
         for data in relationships[rel]["data"]:
@@ -236,12 +242,6 @@ def insert_dummy_data(db_session):
             tmp[data[0]-1].append(models[relationships[rel]["target"]][data[1]-1])
         for m in tmp:
             setattr(models[rel][m], relationships[rel]["rel_name"], tmp[m])
-
-    for table in models:
-        # db_session.add_all(models[table])
-        for model in models[table]:
-            db_session.add(model)
-            db_session.flush()
 
     try:
         db_session.commit()
